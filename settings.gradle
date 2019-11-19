@@ -1,0 +1,2 @@
+include ':sample', ':pickle'
+rootProject.name='PickleSample'
