@@ -1,2 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="life.sabujak.pickle" />
+    package="life.sabujak.pickle">
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+
+    <application>
+        <activity android:name=".ui.PickleActivity"></activity>
+    </application>
+
+</manifest>
