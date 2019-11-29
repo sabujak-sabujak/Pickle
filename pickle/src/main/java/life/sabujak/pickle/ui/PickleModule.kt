@@ -7,8 +7,9 @@ import life.sabujak.pickle.R
 import life.sabujak.pickle.databinding.ActivityPickleBinding
 import life.sabujak.pickle.di.PickleScope
 import life.sabujak.pickle.di.ViewModelModule
+import life.sabujak.pickle.ui.insta.InstagramSubcomponent
 
-@Module(includes = [ViewModelModule::class])
+@Module(includes = [ViewModelModule::class], subcomponents = [InstagramSubcomponent::class])
 class PickleModule{
 
     @Provides
@@ -16,6 +17,7 @@ class PickleModule{
     fun provideBinding(activity:PickleActivity): ActivityPickleBinding {
         return DataBindingUtil.setContentView(activity, R.layout.activity_pickle)
     }
+
 
 
 }
