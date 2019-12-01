@@ -2,16 +2,51 @@ package life.sabujak.pickle.ui
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.databinding.DataBindingUtil
+import io.reactivex.disposables.CompositeDisposable
+import life.sabujak.pickle.R
 import life.sabujak.pickle.databinding.ActivityPickleBinding
-import javax.inject.Inject
+import life.sabujak.pickle.util.Logger
 
 class PickleActivity : AppCompatActivity() {
 
-    @Inject
-    lateinit var binding:ActivityPickleBinding
+    private val logger = Logger.getLogger(PickleActivity::class)
+    private val picklePermission = PicklePermission(this)
+    private lateinit var binding: ActivityPickleBinding
+    private val disposables = CompositeDisposable()
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        DaggerPickleComponent.factory().create(this).inject(this)
+        logger.d("onCreate")
+        disposables.add( picklePermission.request().subscribe { granted ->
+            logger.d("pickle permission = $granted")
+            if(granted){
+                initUI()
+            }else{
+                logger.w("pickle permission has not granted")
+            }
+        })
+    }
+
+    private fun initUI(){
+        logger.d("initUI")
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_pickle)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        if(!disposables.isDisposed){
+            disposables.dispose()
+        }
+    }
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        picklePermission.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        logger.d("onRequestPermissionsResult")
     }
 }
