@@ -15,7 +15,7 @@ import life.sabujak.pickle.util.Logger
 
 class InstaFragment : Fragment() {
 
-    val logger = Logger.getLogger(InstaFragment::class)
+    val logger = Logger.getLogger("InstaFragment")
 
     lateinit var binding: FragmentInstaBinding
     lateinit var viewModel :InstaViewModel

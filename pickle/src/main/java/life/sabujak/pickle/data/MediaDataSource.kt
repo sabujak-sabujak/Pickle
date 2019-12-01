@@ -15,14 +15,8 @@ import life.sabujak.pickle.data.entity.Video
 import life.sabujak.pickle.util.Logger
 
 
-/**
- * 18만장 = 920ms
- * 18만장, ID만 = 650ms
- *
- */
-
 class MediaDataSource(val context: Context,val lifecycle:Lifecycle) : PositionalDataSource<PickleMedia>(),LifecycleObserver {
-    val logger = Logger.getLogger(MediaDataSource::class)
+    val logger = Logger.getLogger(MediaDataSource::class.java.simpleName)
 
     lateinit var cursor:Cursor
     val uri = MediaStore.Files.getContentUri(MediaStore.VOLUME_EXTERNAL)
@@ -36,6 +30,7 @@ class MediaDataSource(val context: Context,val lifecycle:Lifecycle) : Positional
         params: LoadInitialParams,
         callback: LoadInitialCallback<PickleMedia>
     ) {
+
         var time = System.currentTimeMillis()
 
         val projection = arrayOf(
@@ -58,6 +53,9 @@ class MediaDataSource(val context: Context,val lifecycle:Lifecycle) : Positional
 
         time = System.currentTimeMillis()
         val mediaList = ArrayList<PickleMedia>()
+        if(cursor.count ==0){
+            return
+        }
         for(i in 0 until params.requestedLoadSize){
             cursor.moveToNext()
             val media = getPickleMedia(cursor)

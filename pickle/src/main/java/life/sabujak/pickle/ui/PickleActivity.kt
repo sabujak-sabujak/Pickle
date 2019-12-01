@@ -10,7 +10,7 @@ import life.sabujak.pickle.util.Logger
 
 class PickleActivity : AppCompatActivity() {
 
-    private val logger = Logger.getLogger(PickleActivity::class)
+    private val logger = Logger.getLogger("PickleActivity")
     private val picklePermission = PicklePermission(this)
     private lateinit var binding: ActivityPickleBinding
     private val disposables = CompositeDisposable()

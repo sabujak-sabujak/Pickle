@@ -11,9 +11,13 @@ import life.sabujak.pickle.util.Logger
 
 class InstaViewModel (context:Context, lifecycle: Lifecycle){
 
-    private val logger = Logger.getLogger(InstaViewModel::class)
-
+    private val logger = Logger.getLogger("InstaViewModel")
     val items : LiveData<PagedList<PickleMedia>> =
         LivePagedListBuilder(MediaDataSourceFactory(context, lifecycle),1)
             .build()
+    init {
+        logger.i("InstaViewModel created")
+    }
+
+
 }

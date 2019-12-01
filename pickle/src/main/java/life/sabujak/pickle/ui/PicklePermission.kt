@@ -12,7 +12,7 @@ import io.reactivex.subjects.AsyncSubject
 import life.sabujak.pickle.util.Logger
 
 class PicklePermission(val activity:PickleActivity):LifecycleObserver{
-    private val logger = Logger.getLogger(PicklePermission::class)
+    private val logger = Logger.getLogger("PicklePermission")
 
     companion object{
         val REQ_CODE_PERMISSIONS = 0
