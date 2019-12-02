@@ -42,7 +42,7 @@ class PickleDataSource(val context: Context) : PositionalDataSource<PickleMedia>
                 + " OR " + MediaStore.Files.FileColumns.MEDIA_TYPE
                 + "=" + MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO + ")")
         val selectionArgs = null
-        val sortOrder = null
+        val sortOrder = String.format("%s %s", MediaStore.MediaColumns.DATE_ADDED, "desc")
         cursor = context.contentResolver.query(uri, projection, selection, selectionArgs, sortOrder)!!
         logger.d("query time = ${System.currentTimeMillis()-time}")
         logger.d("cursor size = ${cursor.count}")
