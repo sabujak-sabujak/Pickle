@@ -16,7 +16,10 @@ class PickleDataSource(val context: Context) : PositionalDataSource<PickleMedia>
     val logger = Logger.getLogger(PickleDataSource::class.java.simpleName)
 
     lateinit var cursor:Cursor
-    val uri = MediaStore.Files.getContentUri(MediaStore.VOLUME_EXTERNAL)
+    companion object{
+        val uri = MediaStore.Files.getContentUri(MediaStore.VOLUME_EXTERNAL)
+    }
+
 
 
     override fun loadInitial(

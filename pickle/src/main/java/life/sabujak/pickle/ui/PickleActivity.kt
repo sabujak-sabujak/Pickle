@@ -4,8 +4,10 @@ import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.Observer
 import io.reactivex.disposables.CompositeDisposable
 import life.sabujak.pickle.R
+import life.sabujak.pickle.data.PickleContentObserver
 import life.sabujak.pickle.databinding.ActivityPickleBinding
 import life.sabujak.pickle.util.Logger
 
@@ -13,10 +15,12 @@ class PickleActivity : AppCompatActivity() {
 
     private val logger = Logger.getLogger("PickleActivity")
     private val picklePermission = PicklePermission(this)
-    private lateinit var binding: ActivityPickleBinding
     private val disposables = CompositeDisposable()
+    private val viewModel: PickleViewModel by viewModels()
 
-    val viewModel :PickleViewModel by viewModels()
+    private lateinit var binding: ActivityPickleBinding
+    private lateinit var contentObserver: PickleContentObserver
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,6 +38,13 @@ class PickleActivity : AppCompatActivity() {
     private fun initUI(){
         logger.d("initUI")
         binding = DataBindingUtil.setContentView(this, R.layout.activity_pickle)
+        contentObserver = PickleContentObserver(this)
+        contentObserver.contentChangedEvent.observe(this,
+            Observer {
+                logger.i("onChangedEvent From PickleContentObserver")
+                viewModel.invalidateDataSource()
+            }
+        )
     }
 
     override fun onDestroy() {
