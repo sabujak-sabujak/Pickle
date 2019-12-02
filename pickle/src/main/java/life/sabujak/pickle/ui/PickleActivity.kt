@@ -1,6 +1,7 @@
 package life.sabujak.pickle.ui
 
 import android.os.Bundle
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import io.reactivex.disposables.CompositeDisposable
@@ -15,6 +16,7 @@ class PickleActivity : AppCompatActivity() {
     private lateinit var binding: ActivityPickleBinding
     private val disposables = CompositeDisposable()
 
+    val viewModel :PickleViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

@@ -5,9 +5,6 @@ import android.content.ContentUris
 import android.content.Context
 import android.database.Cursor
 import android.provider.MediaStore
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleObserver
-import androidx.lifecycle.OnLifecycleEvent
 import androidx.paging.PositionalDataSource
 import life.sabujak.pickle.data.entity.Photo
 import life.sabujak.pickle.data.entity.PickleMedia
@@ -15,16 +12,12 @@ import life.sabujak.pickle.data.entity.Video
 import life.sabujak.pickle.util.Logger
 
 
-class MediaDataSource(val context: Context,val lifecycle:Lifecycle) : PositionalDataSource<PickleMedia>(),LifecycleObserver {
-    val logger = Logger.getLogger(MediaDataSource::class.java.simpleName)
+class PickleDataSource(val context: Context) : PositionalDataSource<PickleMedia>(){
+    val logger = Logger.getLogger(PickleDataSource::class.java.simpleName)
 
     lateinit var cursor:Cursor
     val uri = MediaStore.Files.getContentUri(MediaStore.VOLUME_EXTERNAL)
 
-
-    init {
-        lifecycle.addObserver(this)
-    }
 
     override fun loadInitial(
         params: LoadInitialParams,
@@ -94,11 +87,12 @@ class MediaDataSource(val context: Context,val lifecycle:Lifecycle) : Positional
         }
     }
 
-    @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
-    fun onDestroy(){
+    fun closeCursor(){
         if(!cursor.isClosed){
             cursor.close()
         }
     }
+
+
 
 }
