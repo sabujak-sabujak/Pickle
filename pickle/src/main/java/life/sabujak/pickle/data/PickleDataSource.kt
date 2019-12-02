@@ -11,7 +11,9 @@ import life.sabujak.pickle.data.entity.PickleMedia
 import life.sabujak.pickle.data.entity.Video
 import life.sabujak.pickle.util.Logger
 
-
+/**
+ * query time 660ms for 180,185(Images and Videos)
+ */
 class PickleDataSource(val context: Context) : PositionalDataSource<PickleMedia>(){
     val logger = Logger.getLogger(PickleDataSource::class.java.simpleName)
 
@@ -19,8 +21,6 @@ class PickleDataSource(val context: Context) : PositionalDataSource<PickleMedia>
     companion object{
         val uri = MediaStore.Files.getContentUri(MediaStore.VOLUME_EXTERNAL)
     }
-
-
 
     override fun loadInitial(
         params: LoadInitialParams,
@@ -37,12 +37,19 @@ class PickleDataSource(val context: Context) : PositionalDataSource<PickleMedia>
             MediaStore.Files.FileColumns.SIZE,
             MediaStore.Video.VideoColumns.DURATION
         )
-        val selection = ("(" + MediaStore.Files.FileColumns.MEDIA_TYPE
-                + "=" + MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE
-                + " OR " + MediaStore.Files.FileColumns.MEDIA_TYPE
-                + "=" + MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO + ")")
-        val selectionArgs = null
+
+        val selection = "" +
+                "${MediaStore.Files.FileColumns.MEDIA_TYPE}=?" +
+                " OR " +
+                "${MediaStore.Files.FileColumns.MEDIA_TYPE}=?"
+
+        val selectionArgs = arrayOf(
+            "${MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE}",
+            "${MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO}"
+        )
+
         val sortOrder = String.format("%s %s", MediaStore.MediaColumns.DATE_ADDED, "desc")
+
         cursor = context.contentResolver.query(uri, projection, selection, selectionArgs, sortOrder)!!
         logger.d("query time = ${System.currentTimeMillis()-time}")
         logger.d("cursor size = ${cursor.count}")
