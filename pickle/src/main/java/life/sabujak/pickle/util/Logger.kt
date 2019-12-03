@@ -1,19 +1,14 @@
 package life.sabujak.pickle.util
 
 import android.util.Log
-import kotlin.reflect.KClass
 
-class Logger(val tag: String? = "Pickle") {
+class Logger constructor(val tag: String? = "Pickle") {
 
     companion object{
+        @JvmStatic
         fun getLogger(tag:String):Logger{
             return Logger(tag)
         }
-
-        fun getLogger(kClass: KClass<*>): Logger {
-            return Logger(kClass.simpleName)
-        }
-
     }
 
     fun v(message: String) {

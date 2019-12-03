@@ -11,7 +11,7 @@ import life.sabujak.pickle.util.Logger
 
 class InstaAdapter : PagedListAdapter<PickleMedia, BindingHolder>(diffCallback) {
 
-    val logger = Logger.getLogger(InstaAdapter::class)
+    val logger = Logger.getLogger("InstaAdapter")
 
     interface ItemClick {
         fun onClick(view: View, position: Int)

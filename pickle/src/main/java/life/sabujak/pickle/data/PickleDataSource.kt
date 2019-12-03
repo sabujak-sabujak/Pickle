@@ -5,37 +5,28 @@ import android.content.ContentUris
 import android.content.Context
 import android.database.Cursor
 import android.provider.MediaStore
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleObserver
-import androidx.lifecycle.OnLifecycleEvent
 import androidx.paging.PositionalDataSource
 import life.sabujak.pickle.data.entity.Photo
 import life.sabujak.pickle.data.entity.PickleMedia
 import life.sabujak.pickle.data.entity.Video
 import life.sabujak.pickle.util.Logger
 
-
 /**
- * 18만장 = 920ms
- * 18만장, ID만 = 650ms
- *
+ * query time 660ms for 180,185(Images and Videos)
  */
-
-class MediaDataSource(val context: Context,val lifecycle:Lifecycle) : PositionalDataSource<PickleMedia>(),LifecycleObserver {
-    val logger = Logger.getLogger(MediaDataSource::class)
+class PickleDataSource(val context: Context) : PositionalDataSource<PickleMedia>(){
+    val logger = Logger.getLogger(PickleDataSource::class.java.simpleName)
 
     lateinit var cursor:Cursor
-    val uri = MediaStore.Files.getContentUri(MediaStore.VOLUME_EXTERNAL)
-
-
-    init {
-        lifecycle.addObserver(this)
+    companion object{
+        val uri = MediaStore.Files.getContentUri(MediaStore.VOLUME_EXTERNAL)
     }
 
     override fun loadInitial(
         params: LoadInitialParams,
         callback: LoadInitialCallback<PickleMedia>
     ) {
+
         var time = System.currentTimeMillis()
 
         val projection = arrayOf(
@@ -46,18 +37,28 @@ class MediaDataSource(val context: Context,val lifecycle:Lifecycle) : Positional
             MediaStore.Files.FileColumns.SIZE,
             MediaStore.Video.VideoColumns.DURATION
         )
-        val selection = ("(" + MediaStore.Files.FileColumns.MEDIA_TYPE
-                + "=" + MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE
-                + " OR " + MediaStore.Files.FileColumns.MEDIA_TYPE
-                + "=" + MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO + ")")
-        val selectionArgs = null
-        val sortOrder = null
+
+        val selection = "" +
+                "${MediaStore.Files.FileColumns.MEDIA_TYPE}=?" +
+                " OR " +
+                "${MediaStore.Files.FileColumns.MEDIA_TYPE}=?"
+
+        val selectionArgs = arrayOf(
+            "${MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE}",
+            "${MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO}"
+        )
+
+        val sortOrder = String.format("%s %s", MediaStore.MediaColumns.DATE_ADDED, "desc")
+
         cursor = context.contentResolver.query(uri, projection, selection, selectionArgs, sortOrder)!!
         logger.d("query time = ${System.currentTimeMillis()-time}")
         logger.d("cursor size = ${cursor.count}")
 
         time = System.currentTimeMillis()
         val mediaList = ArrayList<PickleMedia>()
+        if(cursor.count ==0){
+            return
+        }
         for(i in 0 until params.requestedLoadSize){
             cursor.moveToNext()
             val media = getPickleMedia(cursor)
@@ -96,11 +97,12 @@ class MediaDataSource(val context: Context,val lifecycle:Lifecycle) : Positional
         }
     }
 
-    @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
-    fun onDestroy(){
+    fun closeCursor(){
         if(!cursor.isClosed){
             cursor.close()
         }
     }
+
+
 
 }
