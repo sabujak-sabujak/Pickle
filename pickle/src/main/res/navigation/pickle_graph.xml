@@ -11,4 +11,11 @@
         android:id="@+id/instagramFragment"
         android:name="life.sabujak.pickle.ui.insta.InstaFragment"
         android:label="InstagramFragment" />
+
+    <fragment
+        android:id="@+id/pickleFragment"
+        android:name="life.sabujak.pickle.ui.basic.PickleFragment"
+        android:label="PickleFragment" />
+
+
 </navigation>

@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
@@ -24,17 +25,20 @@ class InstaFragment : Fragment() {
 
     lateinit var binding: FragmentInstaBinding
     lateinit var viewModel:PickleViewModel
+    lateinit var preViewModel:PreViewModel
     val adapter = InstaAdapter()
     val gridLayoutManager by lazy {
-        GridLayoutManager(context, 4)
+        GridLayoutManager(context, 3)
     }
 
     var selectedPosition: Int = -1
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
+        (activity as AppCompatActivity).supportActionBar?.hide()
         activity?.let {
             viewModel = ViewModelProviders.of(it).get(PickleViewModel::class.java)
+            preViewModel = ViewModelProviders.of(it).get(PreViewModel::class.java)
         }
     }
 
@@ -44,6 +48,10 @@ class InstaFragment : Fragment() {
         viewModel.items.observe(this, Observer { pagedList ->
             adapter.submitList(pagedList)
         })
+        preViewModel.scaleType.observe(this, Observer { scaleType ->
+            iv_preview.scaleType = scaleType
+            loadImageView(selectedPosition)
+        })
     }
 
     override fun onCreateView(
@@ -52,7 +60,7 @@ class InstaFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_insta, container, false)
-        binding.frag = this
+        binding.viewModel = preViewModel
         binding.recyclerView.adapter = adapter
         binding.recyclerView.layoutManager = gridLayoutManager
         adapter.itemClick = object: InstaAdapter.ItemClick{
@@ -74,12 +82,4 @@ class InstaFragment : Fragment() {
             Glide.with(iv_preview).load(it).into(iv_preview)
         }
     }
-
-    fun ratioBtnClicked(view: View){
-        logger.d("ratioBtnClicked")
-        if(iv_preview.scaleType == ImageView.ScaleType.CENTER_CROP) iv_preview.scaleType = ImageView.ScaleType.CENTER_INSIDE
-        else iv_preview.scaleType = ImageView.ScaleType.CENTER_CROP
-        loadImageView(selectedPosition)
-    }
-
 }

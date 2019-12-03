@@ -4,8 +4,8 @@
 
     <data>
         <variable
-            name="frag"
-            type="life.sabujak.pickle.ui.insta.InstaFragment" />
+            name="viewModel"
+            type="life.sabujak.pickle.ui.insta.PreViewModel" />
 
     </data>
 
@@ -32,15 +32,15 @@
                     app:layout_constraintTop_toTopOf="parent" />
                 <ImageView
                     android:id="@+id/iv_ratio"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
                     android:layout_margin="8dp"
                     android:src="@drawable/ic_ratio_white_24dp"
                     android:clickable="true"
                     android:focusable="true"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintLeft_toLeftOf="parent"
-                    android:onClick="@{frag::ratioBtnClicked}"
+                    android:onClick="@{()->viewModel.ratioClicked()}"
                     />
 
 
