@@ -72,5 +72,7 @@ dependencies {
     //navigation
     implementation "androidx.navigation:navigation-fragment-ktx:$navigation_version"
     implementation "androidx.navigation:navigation-ui-ktx:$navigation_version"
+    //fragment container view 사용
+    implementation "androidx.fragment:fragment:1.2.0-rc02"
 
 }
