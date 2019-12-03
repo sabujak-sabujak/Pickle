@@ -39,6 +39,9 @@ class PickleActivity : AppCompatActivity() {
     private fun initUI(){
         logger.d("initUI")
         binding = DataBindingUtil.setContentView(this, R.layout.activity_pickle)
+        binding.lifecycleOwner = this
+
+        setSupportActionBar(binding.toolBar)
 
         val navHostFragment = NavHostFragment()
         supportFragmentManager.beginTransaction()
@@ -50,7 +53,7 @@ class PickleActivity : AppCompatActivity() {
         val navInflater = navController.navInflater
         val navGraph = navInflater.inflate(R.navigation.pickle_graph)
 
-        if(intent.action!=null && intent.action!!.equals("insta")){
+        if(intent.action!=null && intent.action!! == "insta"){
             navGraph.startDestination = R.id.instagramFragment
         }else{
             navGraph.startDestination = R.id.pickleFragment

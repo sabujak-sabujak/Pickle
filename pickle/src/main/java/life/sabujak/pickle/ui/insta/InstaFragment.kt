@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
@@ -28,6 +29,7 @@ class InstaFragment : Fragment() {
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
+        (activity as AppCompatActivity).supportActionBar?.hide()
         activity?.let {
             viewModel = ViewModelProviders.of(it).get(PickleViewModel::class.java)
         }
