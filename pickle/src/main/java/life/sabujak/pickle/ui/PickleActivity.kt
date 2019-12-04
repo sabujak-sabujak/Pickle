@@ -11,11 +11,13 @@ import life.sabujak.pickle.R
 import life.sabujak.pickle.data.PickleContentObserver
 import life.sabujak.pickle.databinding.ActivityPickleBinding
 import life.sabujak.pickle.util.Logger
+import life.sabujak.pickle.util.PicklePermission
 
 class PickleActivity : AppCompatActivity() {
 
     private val logger = Logger.getLogger("PickleActivity")
-    private val picklePermission = PicklePermission(this)
+    private val picklePermission =
+        PicklePermission(this)
     private val disposables = CompositeDisposable()
     private val viewModel: PickleViewModel by viewModels()
 
@@ -32,6 +34,7 @@ class PickleActivity : AppCompatActivity() {
                 initUI()
             }else{
                 logger.w("pickle permission has not granted")
+                finish()
             }
         })
     }

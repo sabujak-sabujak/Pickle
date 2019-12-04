@@ -3,6 +3,8 @@ package life.sabujak.pickle.ui.insta
 import android.view.ViewGroup
 import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
+import life.sabujak.pickle.BR
+import life.sabujak.pickle.R
 import life.sabujak.pickle.data.entity.PickleMedia
 import life.sabujak.pickle.ui.BindingHolder
 
@@ -22,9 +24,7 @@ class InstaAdapter : PagedListAdapter<PickleMedia, BindingHolder>(diffCallback) 
     }
 
     override fun getItemViewType(position: Int): Int {
-        return getItem(position)
-            ?.let { it.getType().layoutResId }
-            ?: run { PickleMedia.Type.PHOTO.layoutResId }
+        return R.layout.view_insta_media
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BindingHolder{
@@ -34,8 +34,9 @@ class InstaAdapter : PagedListAdapter<PickleMedia, BindingHolder>(diffCallback) 
     override fun onBindViewHolder(holder: BindingHolder, position: Int) {
         val item = getItem(position)
         item?.let {
-            holder.binding.setVariable(item.getType().variableId,item)
+            holder.binding.setVariable(BR.pickleMedia,item)
         }
+        holder.binding.executePendingBindings()
 
     }
 
