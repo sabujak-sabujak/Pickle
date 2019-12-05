@@ -18,6 +18,8 @@ class InstaAdapter : PagedListAdapter<PickleMedia, BindingHolder>(diffCallback) 
     }
 
     var itemClick: ItemClick? = null
+    var lastClickedPosition: Int = -1
+    var lastClickedView: View? = null
 
     companion object {
         val diffCallback = object : DiffUtil.ItemCallback<PickleMedia>() {
@@ -43,15 +45,25 @@ class InstaAdapter : PagedListAdapter<PickleMedia, BindingHolder>(diffCallback) 
 
     override fun onBindViewHolder(holder: BindingHolder, position: Int) {
         val item = getItem(position)
+
         item?.let {
             holder.binding.setVariable(item.getType().variableId,item)
+            if(position != lastClickedPosition) holder.itemView.v_cover.visibility = View.INVISIBLE
             holder.itemView.setOnClickListener{v->
-                logger.d("item Clicked")
-//                holder.itemView.v_cover.visibility = View.VISIBLE
+                logger.d("item Clicked ")
+                holder.itemView.v_cover.visibility = View.VISIBLE
+                if(lastClickedPosition != -1 && lastClickedPosition != position) unSelectLastItem()
+                lastClickedPosition = position
+                lastClickedView = holder.itemView
                 itemClick?.onClick(v, position)
             }
         }
+    }
 
+    fun unSelectLastItem(){
+        lastClickedView?.let {
+            it.v_cover.visibility = View.INVISIBLE
+        }
     }
 
     fun getPickleMeida(position: Int): PickleMedia?{

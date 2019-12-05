@@ -8,6 +8,8 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
+import androidx.dynamicanimation.animation.DynamicAnimation
+import androidx.dynamicanimation.animation.FlingAnimation
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
@@ -32,6 +34,10 @@ class InstaFragment : Fragment() {
     }
 
     var selectedPosition: Int = -1
+
+    val flingAnimationY: FlingAnimation by lazy(LazyThreadSafetyMode.NONE){
+        FlingAnimation(preview_layout, DynamicAnimation.Y).setFriction(1.1f).setMaxValue(preview_layout.height.toFloat())
+    }
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -67,6 +73,7 @@ class InstaFragment : Fragment() {
             override fun onClick(view: View, position: Int) {
                 selectedPosition = position
                 loadImageView(position)
+                animateForSelection(view)
             }
         }
         return binding.root
@@ -81,5 +88,19 @@ class InstaFragment : Fragment() {
         selected?.getUri()?.let{
             Glide.with(iv_preview).load(it).into(iv_preview)
         }
+    }
+    fun animateForSelection(selectedView: View){
+        // fling down animation preview_layout
+//        FlingAnimation(preview_layout, DynamicAnimation.SCROLL_Y).apply{
+//            setStartVelocity(-100)
+//            setMinValue(0)
+//            setMaxValue(preview_layout.height.toFloat())
+//            start()
+//        }
+//        flingAnimationY.setStartVelocity()
+        flingAnimationY.start()
+
+        // scroll recyclerview to selected view
+
     }
 }
