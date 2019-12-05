@@ -6,7 +6,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
 import androidx.recyclerview.widget.RecyclerView
 
-class BindingHolder: RecyclerView.ViewHolder{
+open class BindingHolder: RecyclerView.ViewHolder{
     val binding : ViewDataBinding
 
     constructor(binding:ViewDataBinding):super(binding.root){

@@ -1,4 +1,4 @@
-package life.sabujak.pickle.ui
+package life.sabujak.pickle.util
 
 import androidx.databinding.DataBindingComponent
 

@@ -89,11 +89,11 @@ class PickleDataSource(val context: Context) : PositionalDataSource<PickleMedia>
         val isVideo = MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO==mediaType
         val dateModified = cursor.getLong(cursor.getColumnIndex(MediaStore.Video.Media.DATE_MODIFIED))
         val fileSize = cursor.getInt(cursor.getColumnIndex(MediaStore.Files.FileColumns.SIZE))
-        if(isVideo){
+        return if(isVideo){
             val duration = cursor.getLong(cursor.getColumnIndex(MediaStore.Video.VideoColumns.DURATION))
-            return Video(id,contentUri, data, dateModified, fileSize,duration)
+            Video(id,contentUri, data, dateModified, fileSize,duration)
         }else{
-            return Photo(id,contentUri, data, dateModified, fileSize)
+            Photo(id,contentUri, data, dateModified, fileSize)
         }
     }
 

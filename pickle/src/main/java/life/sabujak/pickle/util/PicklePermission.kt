@@ -1,4 +1,4 @@
-package life.sabujak.pickle.ui
+package life.sabujak.pickle.util
 
 import android.Manifest
 import android.content.pm.PackageManager
@@ -9,9 +9,9 @@ import androidx.lifecycle.OnLifecycleEvent
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.toObservable
 import io.reactivex.subjects.AsyncSubject
-import life.sabujak.pickle.util.Logger
+import life.sabujak.pickle.ui.PickleActivity
 
-class PicklePermission(val activity:PickleActivity):LifecycleObserver{
+class PicklePermission(val activity: PickleActivity):LifecycleObserver{
     private val logger = Logger.getLogger("PicklePermission")
 
     companion object{
@@ -36,7 +36,9 @@ class PicklePermission(val activity:PickleActivity):LifecycleObserver{
                 .toList()
                 .subscribe({
                     if(it.isNotEmpty()){
-                        ActivityCompat.requestPermissions(activity, it.toTypedArray(), REQ_CODE_PERMISSIONS)
+                        ActivityCompat.requestPermissions(activity, it.toTypedArray(),
+                            REQ_CODE_PERMISSIONS
+                        )
                     }else{
                         logger.i("complete")
                         result.onNext(true)
@@ -48,7 +50,7 @@ class PicklePermission(val activity:PickleActivity):LifecycleObserver{
     }
 
     fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
-        if(requestCode==REQ_CODE_PERMISSIONS){
+        if(requestCode== REQ_CODE_PERMISSIONS){
             for(grantResult in grantResults){
                 if(grantResult != PackageManager.PERMISSION_GRANTED){
                     result.onNext(false)

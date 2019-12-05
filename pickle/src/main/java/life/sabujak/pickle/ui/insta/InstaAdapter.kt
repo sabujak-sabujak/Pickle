@@ -5,6 +5,8 @@ import android.view.ViewGroup
 import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
 import kotlinx.android.synthetic.main.view_insta_media.view.*
+import life.sabujak.pickle.BR
+import life.sabujak.pickle.R
 import life.sabujak.pickle.data.entity.PickleMedia
 import life.sabujak.pickle.ui.BindingHolder
 import life.sabujak.pickle.util.Logger
@@ -34,9 +36,7 @@ class InstaAdapter : PagedListAdapter<PickleMedia, BindingHolder>(diffCallback) 
     }
 
     override fun getItemViewType(position: Int): Int {
-        return getItem(position)
-            ?.let { it.getType().layoutResId }
-            ?: run { PickleMedia.Type.PHOTO.layoutResId }
+        return R.layout.view_insta_media
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BindingHolder{
@@ -45,9 +45,8 @@ class InstaAdapter : PagedListAdapter<PickleMedia, BindingHolder>(diffCallback) 
 
     override fun onBindViewHolder(holder: BindingHolder, position: Int) {
         val item = getItem(position)
-
         item?.let {
-            holder.binding.setVariable(item.getType().variableId,item)
+            holder.binding.setVariable(BR.pickleMedia,item)
             if(position != lastClickedPosition) holder.itemView.v_cover.visibility = View.INVISIBLE
             holder.itemView.setOnClickListener{v->
                 logger.d("item Clicked ")
@@ -57,7 +56,9 @@ class InstaAdapter : PagedListAdapter<PickleMedia, BindingHolder>(diffCallback) 
                 lastClickedView = holder.itemView
                 itemClick?.onClick(v, position)
             }
+            holder.binding.executePendingBindings()
         }
+
     }
 
     fun unSelectLastItem(){
@@ -65,7 +66,6 @@ class InstaAdapter : PagedListAdapter<PickleMedia, BindingHolder>(diffCallback) 
             it.v_cover.visibility = View.INVISIBLE
         }
     }
-
     fun getPickleMeida(position: Int): PickleMedia?{
         return getItem(position)
     }
