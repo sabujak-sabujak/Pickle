@@ -16,6 +16,7 @@ import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.GridLayoutManager
 import com.bumptech.glide.Glide
 import kotlinx.android.synthetic.main.fragment_insta.*
+import kotlinx.android.synthetic.main.fragment_insta.view.*
 import life.sabujak.pickle.R
 import life.sabujak.pickle.databinding.FragmentInstaBinding
 import life.sabujak.pickle.ui.PickleViewModel
@@ -56,7 +57,9 @@ class InstaFragment : Fragment() {
         })
         preViewModel.scaleType.observe(this, Observer { scaleType ->
             iv_preview.scaleType = scaleType
-            loadImageView(selectedPosition)
+            iv_preview.drawable?.let{
+                loadImageView(selectedPosition)
+            }
         })
     }
 
