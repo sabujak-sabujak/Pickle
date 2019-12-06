@@ -78,4 +78,7 @@ dependencies {
     implementation "androidx.recyclerview:recyclerview-selection:1.0.0"
 
 
+    //for Animation
+    implementation "androidx.dynamicanimation:dynamicanimation:1.0.0"
+
 }
