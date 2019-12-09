@@ -25,7 +25,6 @@ import life.sabujak.pickle.ui.PickleViewModel
 import life.sabujak.pickle.util.Logger
 
 class InstaFragment : Fragment() {
-
     val logger = Logger.getLogger("InstaFragment")
 
     lateinit var binding: FragmentInstaBinding
@@ -53,8 +52,7 @@ class InstaFragment : Fragment() {
             instaAdapter.submitList(pagedList)
         })
         preViewModel.scaleType.observe(this, Observer { scaleType ->
-            iv_preview.scaleType = scaleType
-            iv_preview.drawable?.let{
+            iv_preview.drawable?.let {
                 loadImageView(selectedPosition)
             }
         })
@@ -80,6 +78,7 @@ class InstaFragment : Fragment() {
                 binding.previewLayout.setExpanded(true)
             }
         }
+//        binding.recyclerView.findViewHolderForAdapterPosition(0)?.itemView?.performClick()
         return binding.root
     }
 
@@ -90,7 +89,11 @@ class InstaFragment : Fragment() {
     fun loadImageView(position: Int) {
         val selected = instaAdapter.getPickleMeida(position)
         selected?.getUri()?.let {
-            Glide.with(iv_preview).load(it).into(iv_preview)
+            when (preViewModel.scaleType.value) {
+                GlideScaleType.CENTER_CROP -> Glide.with(iv_preview).load(it).centerCrop().into(iv_preview)
+                GlideScaleType.CENTER_INSIDE -> Glide.with(iv_preview).load(it).centerInside().into(iv_preview)
+                else -> {}
+            }
         }
     }
 }
