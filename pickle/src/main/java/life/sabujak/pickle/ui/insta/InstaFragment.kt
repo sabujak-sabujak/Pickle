@@ -18,6 +18,7 @@ import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
 import kotlinx.android.synthetic.main.fragment_insta.*
+import kotlinx.android.synthetic.main.fragment_insta.view.*
 import life.sabujak.pickle.R
 import life.sabujak.pickle.databinding.FragmentInstaBinding
 import life.sabujak.pickle.ui.PickleViewModel
