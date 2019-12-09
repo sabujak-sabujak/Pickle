@@ -14,12 +14,12 @@
         android:fitsSystemWindows="true">
 
         <com.google.android.material.appbar.AppBarLayout
+            android:id="@+id/preview_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="#000000">
 
             <com.google.android.material.appbar.CollapsingToolbarLayout
-                android:id="@+id/preview_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:fitsSystemWindows="true"

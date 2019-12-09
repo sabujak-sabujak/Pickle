@@ -9,8 +9,7 @@ import androidx.lifecycle.ViewModel
 class PreViewModel : ViewModel() {
     // scaleType CENTER_CROP/CENTER_INSIDE, Crop output Uri, Multiselection Enable/disable, if Multiselection Uri list
 
-    private val _scaleType = MutableLiveData<ImageView.ScaleType>()
-//    private val _scaleType = MutableLiveData<ImageView.ScaleType>(ImageView.ScaleType.CENTER_CROP)
+    private val _scaleType = MutableLiveData<ImageView.ScaleType>().apply { postValue(ImageView.ScaleType.CENTER_CROP) }
 
     val scaleType: LiveData<ImageView.ScaleType> get() = _scaleType
 
