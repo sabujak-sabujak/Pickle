@@ -1,5 +1,6 @@
 package life.sabujak.pickle.ui.insta
 
+import android.util.SparseBooleanArray
 import android.view.View
 import android.view.ViewGroup
 import androidx.paging.PagedListAdapter
@@ -19,9 +20,10 @@ class InstaAdapter : PagedListAdapter<PickleMedia, BindingHolder>(diffCallback) 
         fun onClick(view: View, position: Int)
     }
 
+    private var selectedItem: SparseBooleanArray = SparseBooleanArray(0)
+
     var itemClick: ItemClick? = null
     var lastClickedPosition: Int = -1
-    var lastClickedView: View? = null
 
     companion object {
         val diffCallback = object : DiffUtil.ItemCallback<PickleMedia>() {
@@ -47,25 +49,28 @@ class InstaAdapter : PagedListAdapter<PickleMedia, BindingHolder>(diffCallback) 
         val item = getItem(position)
         item?.let {
             holder.binding.setVariable(BR.pickleMedia,item)
-            if(position != lastClickedPosition) holder.itemView.v_cover.visibility = View.INVISIBLE
+            holder.itemView.v_cover.visibility = if(isItemSelected(position)) { View.VISIBLE} else {View.INVISIBLE}
             holder.itemView.setOnClickListener{v->
                 logger.d("item Clicked ")
                 holder.itemView.v_cover.visibility = View.VISIBLE
-                if(lastClickedPosition != -1 && lastClickedPosition != position) unSelectLastItem()
+                toggleItemSelected(lastClickedPosition)
+                toggleItemSelected(position)
                 lastClickedPosition = position
-                lastClickedView = holder.itemView
                 itemClick?.onClick(v, position)
             }
             holder.binding.executePendingBindings()
         }
-
     }
 
-    fun unSelectLastItem(){
-        lastClickedView?.let {
-            it.v_cover.visibility = View.INVISIBLE
-        }
+    private fun isItemSelected(position: Int): Boolean{
+        return selectedItem.get(position, false)
     }
+
+    private fun toggleItemSelected(position: Int){
+        if(selectedItem.get(position, false)) selectedItem.delete(position) else selectedItem.put(position, true)
+        notifyDataSetChanged()
+    }
+
     fun getPickleMeida(position: Int): PickleMedia?{
         return getItem(position)
     }
