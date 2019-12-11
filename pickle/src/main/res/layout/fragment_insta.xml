@@ -23,13 +23,13 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:fitsSystemWindows="true"
-                app:layout_scrollFlags="scroll|enterAlways">
+                android:minHeight="56dp"
+                app:layout_scrollFlags="scroll|exitUntilCollapsed|enterAlways">
 
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:fitsSystemWindows="true"
-                    app:layout_scrollFlags="scroll">
+                    android:fitsSystemWindows="true">
 
                     <ImageView
                         android:id="@+id/iv_preview"
