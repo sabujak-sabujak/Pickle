@@ -8,11 +8,11 @@ import androidx.recyclerview.widget.DiffUtil
 import kotlinx.android.synthetic.main.view_insta_media.view.*
 import life.sabujak.pickle.BR
 import life.sabujak.pickle.R
-import life.sabujak.pickle.data.entity.PickleMedia
-import life.sabujak.pickle.ui.BindingHolder
+import life.sabujak.pickle.ui.common.BindingHolder
+import life.sabujak.pickle.ui.common.PickleMediaItem
 import life.sabujak.pickle.util.Logger
 
-class InstaAdapter : PagedListAdapter<PickleMedia, BindingHolder>(diffCallback) {
+class InstaAdapter : PagedListAdapter<PickleMediaItem, BindingHolder>(diffCallback) {
 
     val logger = Logger.getLogger("InstaAdapter")
 
@@ -26,12 +26,12 @@ class InstaAdapter : PagedListAdapter<PickleMedia, BindingHolder>(diffCallback) 
     var lastClickedPosition: Int = -1
 
     companion object {
-        val diffCallback = object : DiffUtil.ItemCallback<PickleMedia>() {
-            override fun areItemsTheSame(oldItem: PickleMedia, newItem: PickleMedia): Boolean {
+        val diffCallback = object : DiffUtil.ItemCallback<PickleMediaItem>() {
+            override fun areItemsTheSame(oldItem: PickleMediaItem, newItem: PickleMediaItem): Boolean {
                 return oldItem.getId() == newItem.getId()
             }
 
-            override fun areContentsTheSame(oldItem: PickleMedia, newItem: PickleMedia): Boolean {
+            override fun areContentsTheSame(oldItem: PickleMediaItem, newItem: PickleMediaItem): Boolean {
                 return oldItem.hashCode() == newItem.hashCode()
             }
         }
@@ -41,14 +41,14 @@ class InstaAdapter : PagedListAdapter<PickleMedia, BindingHolder>(diffCallback) 
         return R.layout.view_insta_media
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BindingHolder{
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BindingHolder {
         return BindingHolder(parent, viewType)
     }
 
     override fun onBindViewHolder(holder: BindingHolder, position: Int) {
         val item = getItem(position)
         item?.let {
-            holder.binding.setVariable(BR.pickleMedia,item)
+            holder.binding.setVariable(BR.item,item)
             holder.itemView.v_cover.visibility = if(isItemSelected(position)) { View.VISIBLE} else {View.INVISIBLE}
             holder.itemView.setOnClickListener{v->
                 logger.d("item Clicked ")
@@ -71,7 +71,7 @@ class InstaAdapter : PagedListAdapter<PickleMedia, BindingHolder>(diffCallback) 
         notifyDataSetChanged()
     }
 
-    fun getPickleMeida(position: Int): PickleMedia?{
+    fun getPickleMedia(position: Int): PickleMediaItem?{
         return getItem(position)
     }
 }

@@ -1,7 +1,6 @@
 package life.sabujak.pickle.ui.insta
 
 import android.content.Context
-import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -13,15 +12,10 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.GridLayoutManager
 import com.bumptech.glide.Glide
-import com.bumptech.glide.load.DataSource
-import com.bumptech.glide.load.engine.GlideException
-import com.bumptech.glide.request.RequestListener
-import com.bumptech.glide.request.target.Target
 import kotlinx.android.synthetic.main.fragment_insta.*
-import kotlinx.android.synthetic.main.fragment_insta.view.*
 import life.sabujak.pickle.R
 import life.sabujak.pickle.databinding.FragmentInstaBinding
-import life.sabujak.pickle.ui.PickleViewModel
+import life.sabujak.pickle.ui.common.PickleViewModel
 import life.sabujak.pickle.util.Logger
 
 class InstaFragment : Fragment() {
@@ -38,8 +32,8 @@ class InstaFragment : Fragment() {
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        (activity as AppCompatActivity).supportActionBar?.hide()
         activity?.let {
+            (it as? AppCompatActivity)?.supportActionBar?.hide()
             viewModel = ViewModelProviders.of(it).get(PickleViewModel::class.java)
             preViewModel = ViewModelProviders.of(it).get(PreViewModel::class.java)
         }
@@ -87,8 +81,8 @@ class InstaFragment : Fragment() {
     }
 
     fun loadImageView(position: Int) {
-        val selected = instaAdapter.getPickleMeida(position)
-        selected?.getUri()?.let {
+        val selected = instaAdapter.getPickleMedia(position)
+        selected?.pickleMedia?.getUri()?.let {
             when (preViewModel.scaleType.value) {
                 GlideScaleType.CENTER_CROP -> Glide.with(iv_preview).load(it).centerCrop().into(iv_preview)
                 GlideScaleType.CENTER_INSIDE -> Glide.with(iv_preview).load(it).centerInside().into(iv_preview)

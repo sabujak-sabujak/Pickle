@@ -5,22 +5,22 @@ import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
 import life.sabujak.pickle.BR
 import life.sabujak.pickle.R
-import life.sabujak.pickle.data.entity.PickleMedia
-import life.sabujak.pickle.ui.BindingHolder
+import life.sabujak.pickle.ui.common.BindingHolder
+import life.sabujak.pickle.ui.common.PickleMediaItem
 import life.sabujak.pickle.util.Logger
 
-class PickleAdapter : PagedListAdapter<PickleMedia, BindingHolder>(diffCallback) {
+class PickleAdapter: PagedListAdapter<PickleMediaItem, BindingHolder>(diffCallback) {
 
     val logger = Logger.getLogger(PickleAdapter::class.java.simpleName)
 
     companion object {
-        val diffCallback = object : DiffUtil.ItemCallback<PickleMedia>() {
-            override fun areItemsTheSame(oldItem: PickleMedia, newItem: PickleMedia): Boolean {
+        val diffCallback = object : DiffUtil.ItemCallback<PickleMediaItem>() {
+            override fun areItemsTheSame(oldItem: PickleMediaItem, newItem: PickleMediaItem): Boolean {
                 return oldItem.getId() == newItem.getId()
             }
 
-            override fun areContentsTheSame(oldItem: PickleMedia, newItem: PickleMedia): Boolean {
-                return false
+            override fun areContentsTheSame(oldItem: PickleMediaItem, newItem: PickleMediaItem): Boolean {
+                return oldItem.hashCode() == newItem.hashCode()
             }
         }
     }
@@ -30,9 +30,7 @@ class PickleAdapter : PagedListAdapter<PickleMedia, BindingHolder>(diffCallback)
     }
 
     override fun getItemId(position: Int): Long {
-        return getItem(position)?.let {
-            it.getId()
-        } ?: run {
+        return getItem(position)?.pickleMedia?.getId()?: run {
             logger.i("getItemId : item not found")
             position.toLong()
         }
@@ -48,11 +46,8 @@ class PickleAdapter : PagedListAdapter<PickleMedia, BindingHolder>(diffCallback)
     }
 
     override fun onBindViewHolder(holder: BindingHolder, position: Int) {
-        val item = getItem(position)
-        holder.binding.setVariable(BR.pickleMedia,item)
+        holder.binding.setVariable(BR.item,getItem(position))
         holder.binding.executePendingBindings()
-
     }
-
-
 }
+

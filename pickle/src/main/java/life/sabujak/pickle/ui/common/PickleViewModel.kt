@@ -1,4 +1,4 @@
-package life.sabujak.pickle.ui
+package life.sabujak.pickle.ui.common
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
@@ -9,14 +9,18 @@ import life.sabujak.pickle.data.PickleDataSourceFactory
 import life.sabujak.pickle.data.entity.PickleMedia
 import life.sabujak.pickle.util.Logger
 
-class PickleViewModel(application:Application): AndroidViewModel(application){
+class PickleViewModel(application: Application) : AndroidViewModel(application),
+    OnPickleEventListener {
 
     private val logger = Logger.getLogger(PickleViewModel::class.java.simpleName)
 
+    val selectionManager = SelectionManager()
+
     private val dataSourceFactory by lazy {
-        PickleDataSourceFactory(application)
+        PickleDataSourceFactory(application, selectionManager, this)
     }
-    val items : LiveData<PagedList<PickleMedia>> = LivePagedListBuilder(dataSourceFactory,50).build()
+    val items: LiveData<PagedList<PickleMediaItem>> =
+        LivePagedListBuilder(dataSourceFactory, 50).build()
 
     fun invalidateDataSource(){
         dataSourceFactory.invalidate()
@@ -25,5 +29,14 @@ class PickleViewModel(application:Application): AndroidViewModel(application){
         super.onCleared()
         dataSourceFactory.closeCursor()
     }
+
+    override fun onItemClick(pickleMedia: PickleMedia) {
+
+    }
+
+    override fun onItemLongClick(pickleMedia: PickleMedia): Boolean {
+        return false
+    }
+
 
 }

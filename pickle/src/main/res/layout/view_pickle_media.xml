@@ -5,21 +5,25 @@
     >
 
     <data>
+
+        <import type="android.view.View" />
         <variable
-            name="pickleMedia"
-            type="life.sabujak.pickle.data.entity.PickleMedia" />
+            name="item"
+            type="life.sabujak.pickle.ui.common.PickleMediaItem" />
 
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:onClick="@{v->item.toggle()}"
         android:orientation="vertical">
         <ImageView
+            android:id="@+id/image"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            app:pickleMedia="@{pickleMedia}"
             android:scaleType="centerCrop"
+            app:pickleMedia="@{item.pickleMedia}"
             app:layout_constraintDimensionRatio="1:1"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -28,14 +32,16 @@
             tools:src="@android:drawable/sym_def_app_icon"
             />
 
-        <CheckBox
-            android:id="@+id/checkbox"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="16dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:background="#77000000"
+            android:visibility="@{item.checked? View.VISIBLE : View.GONE}"
+            app:layout_constraintBottom_toBottomOf="@id/image"
+            app:layout_constraintEnd_toEndOf="@id/image"
+            app:layout_constraintStart_toStartOf="@id/image"
+            app:layout_constraintTop_toTopOf="@id/image" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </layout>

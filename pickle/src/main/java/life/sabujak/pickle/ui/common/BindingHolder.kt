@@ -1,4 +1,4 @@
-package life.sabujak.pickle.ui
+package life.sabujak.pickle.ui.common
 
 import android.view.LayoutInflater
 import android.view.ViewGroup

@@ -9,12 +9,15 @@ import androidx.paging.PositionalDataSource
 import life.sabujak.pickle.data.entity.Photo
 import life.sabujak.pickle.data.entity.PickleMedia
 import life.sabujak.pickle.data.entity.Video
+import life.sabujak.pickle.ui.common.OnPickleEventListener
+import life.sabujak.pickle.ui.common.PickleMediaItem
+import life.sabujak.pickle.ui.common.SelectionManager
 import life.sabujak.pickle.util.Logger
 
 /**
  * query time 660ms for 180,185(Images and Videos)
  */
-class PickleDataSource(val context: Context) : PositionalDataSource<PickleMedia>(){
+class PickleDataSource(val context: Context, val selectionManager: SelectionManager, val onPickleEventListener: OnPickleEventListener) : PositionalDataSource<PickleMediaItem>(){
     val logger = Logger.getLogger(PickleDataSource::class.java.simpleName)
 
     lateinit var cursor:Cursor
@@ -24,7 +27,7 @@ class PickleDataSource(val context: Context) : PositionalDataSource<PickleMedia>
 
     override fun loadInitial(
         params: LoadInitialParams,
-        callback: LoadInitialCallback<PickleMedia>
+        callback: LoadInitialCallback<PickleMediaItem>
     ) {
 
         var time = System.currentTimeMillis()
@@ -55,7 +58,7 @@ class PickleDataSource(val context: Context) : PositionalDataSource<PickleMedia>
         logger.d("cursor size = ${cursor.count}")
 
         time = System.currentTimeMillis()
-        val mediaList = ArrayList<PickleMedia>()
+        val mediaList = ArrayList<PickleMediaItem>()
         if(cursor.count ==0){
             return
         }
@@ -64,22 +67,22 @@ class PickleDataSource(val context: Context) : PositionalDataSource<PickleMedia>
                 break
             }
             val media = getPickleMedia(cursor)
-            mediaList.add(media)
+            mediaList.add(PickleMediaItem(media, selectionManager,onPickleEventListener))
         }
         logger.d("loop time = ${System.currentTimeMillis()-time}")
         callback.onResult(mediaList, 0, cursor.count)
 
     }
 
-    override fun loadRange(params: LoadRangeParams, callback: LoadRangeCallback<PickleMedia>) {
+    override fun loadRange(params: LoadRangeParams, callback: LoadRangeCallback<PickleMediaItem>) {
         logger.d("loadRange : startPostion = ${params.startPosition} loadSize = ${params.loadSize}")
-        val mediaList = ArrayList<PickleMedia>()
+        val mediaList = ArrayList<PickleMediaItem>()
         for(i in 0 until params.loadSize){
             if(!cursor.moveToNext()){
                 break
             }
             val media = getPickleMedia(cursor)
-            mediaList.add(media)
+            mediaList.add(PickleMediaItem(media, selectionManager, onPickleEventListener))
         }
         callback.onResult(mediaList)
     }
