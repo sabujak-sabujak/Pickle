@@ -60,7 +60,9 @@ class PickleDataSource(val context: Context) : PositionalDataSource<PickleMedia>
             return
         }
         for(i in 0 until params.requestedLoadSize){
-            cursor.moveToNext()
+            if(!cursor.moveToNext()){
+                break
+            }
             val media = getPickleMedia(cursor)
             mediaList.add(media)
         }
@@ -73,7 +75,9 @@ class PickleDataSource(val context: Context) : PositionalDataSource<PickleMedia>
         logger.d("loadRange : startPostion = ${params.startPosition} loadSize = ${params.loadSize}")
         val mediaList = ArrayList<PickleMedia>()
         for(i in 0 until params.loadSize){
-            cursor.moveToNext()
+            if(!cursor.moveToNext()){
+                break
+            }
             val media = getPickleMedia(cursor)
             mediaList.add(media)
         }
