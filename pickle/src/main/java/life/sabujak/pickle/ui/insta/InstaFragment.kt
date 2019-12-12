@@ -1,24 +1,21 @@
 package life.sabujak.pickle.ui.insta
 
 import android.content.Context
-import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
+import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.GridLayoutManager
 import com.bumptech.glide.Glide
-import com.bumptech.glide.load.DataSource
-import com.bumptech.glide.load.engine.GlideException
-import com.bumptech.glide.request.RequestListener
-import com.bumptech.glide.request.target.Target
+import com.google.android.material.appbar.AppBarLayout
 import kotlinx.android.synthetic.main.fragment_insta.*
-import kotlinx.android.synthetic.main.fragment_insta.view.*
 import life.sabujak.pickle.R
 import life.sabujak.pickle.databinding.FragmentInstaBinding
 import life.sabujak.pickle.ui.PickleViewModel
@@ -68,7 +65,16 @@ class InstaFragment : Fragment() {
             viewModel = preViewModel
             recyclerView.adapter = instaAdapter
             recyclerView.layoutManager = gridLayoutManager
-//            previewLayout.setOnScrollChangeListener{null}
+            val appBar = previewAppbarLayout as AppBarLayout
+            appBar.layoutParams?.let{
+                val behavior = AppBarLayout.Behavior()
+                behavior.setDragCallback(object: AppBarLayout.Behavior.DragCallback(){
+                    override fun canDrag(p0: AppBarLayout): Boolean {
+                        return false
+                    }
+                })
+                (it as CoordinatorLayout.LayoutParams).behavior = behavior
+            }
         }
 
         instaAdapter.itemClick = object : InstaAdapter.ItemClick {
@@ -76,7 +82,7 @@ class InstaFragment : Fragment() {
                 selectedPosition = position
                 loadImageView(position)
                 binding.recyclerView.smoothScrollBy(0, view.top)
-                binding.previewLayout.setExpanded(true)
+                binding.previewAppbarLayout.setExpanded(true)
             }
         }
         return binding.root

@@ -14,7 +14,7 @@
         android:fitsSystemWindows="true">
 
         <com.google.android.material.appbar.AppBarLayout
-            android:id="@+id/preview_layout"
+            android:id="@+id/preview_appbar_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="#000000">
@@ -24,7 +24,7 @@
                 android:layout_height="wrap_content"
                 android:fitsSystemWindows="true"
                 android:minHeight="56dp"
-                app:layout_scrollFlags="scroll|exitUntilCollapsed|enterAlways">
+                app:layout_scrollFlags="scroll|exitUntilCollapsed|enterAlways|snap">
 
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
@@ -36,9 +36,22 @@
                         android:layout_width="match_parent"
                         android:layout_height="0dp"
                         android:fitsSystemWindows="true"
-                        android:minHeight="24dp"
                         app:layout_constraintDimensionRatio="W,1:1"
                         app:layout_constraintTop_toTopOf="parent" />
+<!--                    <com.naver.android.helloyako.imagecrop.view.ImageCropView xmlns:imagecrop="http://schemas.android.com/apk/res-auto"-->
+<!--                        android:id="@+id/iv_preview"-->
+<!--                        android:layout_width="match_parent"-->
+<!--                        android:layout_height="0dp"-->
+<!--                        android:visibility="visible"-->
+<!--                        app:layout_constraintDimensionRatio="W,1:1"-->
+<!--                        app:layout_constraintTop_toTopOf="parent"-->
+<!--                        imagecrop:gridInnerColor="#66ffffff"-->
+<!--                        imagecrop:gridInnerStroke="1dp"-->
+<!--                        imagecrop:gridOuterColor="#ffffff"-->
+<!--                        imagecrop:gridOuterStroke="1dp"-->
+<!--                        imagecrop:outsideLayerColor="#99000000"-->
+<!--                        imagecrop:setInnerGridMode="on"-->
+<!--                        imagecrop:setOuterGridMode="on" />-->
 
                     <ImageView
                         android:id="@+id/iv_ratio"
