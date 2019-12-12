@@ -7,9 +7,10 @@ import androidx.recyclerview.widget.DiffUtil
 import life.sabujak.pickle.BR
 import life.sabujak.pickle.R
 import life.sabujak.pickle.data.entity.PickleMedia
+import life.sabujak.pickle.ui.BindingHolder
 import life.sabujak.pickle.util.Logger
 
-class PickleAdapter : PagedListAdapter<PickleMedia, PickleDetailsHolder>(diffCallback) {
+class PickleAdapter : PagedListAdapter<PickleMedia, BindingHolder>(diffCallback) {
 
     val logger = Logger.getLogger(PickleAdapter::class.java.simpleName)
 
@@ -42,24 +43,16 @@ class PickleAdapter : PagedListAdapter<PickleMedia, PickleDetailsHolder>(diffCal
     }
 
     override fun getItemViewType(position: Int): Int {
-//        logger.i("getItemViewType position = $position type =${getItem(position)}")
         return R.layout.view_pickle_media
-//        return when(getItem(position)?.getType()){
-//            PickleMedia.Type.PHOTO -> R.layout.view_pickle_media
-//            PickleMedia.Type.VIDEO -> R.layout.view_pickle_media
-//            else -> R.layout.view_pickle_media_placeholder
-////            else->R.layout.view_pickle_media
-//        }
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PickleDetailsHolder {
-        return PickleDetailsHolder(parent, viewType)
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BindingHolder {
+        return BindingHolder(parent, viewType)
     }
 
-    override fun onBindViewHolder(holder: PickleDetailsHolder, position: Int) {
+    override fun onBindViewHolder(holder: BindingHolder, position: Int) {
         val item = getItem(position)
         holder.binding.setVariable(BR.pickleMedia,item)
-        holder.binding.setVariable(BR.selectionTracker,selectionTracker)
         holder.binding.executePendingBindings()
 
     }

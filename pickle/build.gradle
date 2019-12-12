@@ -74,10 +74,6 @@ dependencies {
     implementation "androidx.navigation:navigation-ui-ktx:$navigation_version"
     //fragment container view 사용
     implementation "androidx.fragment:fragment:1.2.0-rc02"
-    //RecyclerView_selection
-    implementation "androidx.recyclerview:recyclerview-selection:1.0.0"
-
-
     //for Animation
     implementation "androidx.dynamicanimation:dynamicanimation:1.0.0"
 

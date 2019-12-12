@@ -9,10 +9,6 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
-import androidx.recyclerview.selection.SelectionPredicates
-import androidx.recyclerview.selection.SelectionTracker
-import androidx.recyclerview.selection.StableIdKeyProvider
-import androidx.recyclerview.selection.StorageStrategy
 import androidx.recyclerview.widget.GridLayoutManager
 import life.sabujak.pickle.R
 import life.sabujak.pickle.databinding.FragmentPickleBinding
@@ -30,17 +26,6 @@ class PickleFragment : Fragment() {
     private val adapter = PickleAdapter()
     private val gridLayoutManager by lazy {
         GridLayoutManager(context, Calculator.getColumnCount(context, R.dimen.pickle_column_width))
-    }
-    val selectionTracker: SelectionTracker<Long> by lazy {
-        SelectionTracker.Builder<Long>(
-            "id_${PickleFragment::class.java.simpleName}",
-            binding.recyclerView,
-            StableIdKeyProvider(binding.recyclerView),
-            PickleDetailsLookUp(binding.recyclerView),
-            StorageStrategy.createLongStorage()
-        )
-            .withSelectionPredicate(SelectionPredicates.createSelectAnything())
-            .build()
     }
 
     override fun onAttach(context: Context) {
@@ -67,7 +52,6 @@ class PickleFragment : Fragment() {
         binding.recyclerView.adapter = adapter
         binding.lifecycleOwner = viewLifecycleOwner
         binding.recyclerView.layoutManager = gridLayoutManager
-        adapter.selectionTracker = selectionTracker
         return binding.root
     }
 
