@@ -2,7 +2,6 @@ package life.sabujak.pickle.ui.basic
 
 import android.view.ViewGroup
 import androidx.paging.PagedListAdapter
-import androidx.recyclerview.selection.SelectionTracker
 import androidx.recyclerview.widget.DiffUtil
 import life.sabujak.pickle.BR
 import life.sabujak.pickle.R
@@ -29,8 +28,6 @@ class PickleAdapter : PagedListAdapter<PickleMedia, BindingHolder>(diffCallback)
     init {
         setHasStableIds(true)
     }
-
-    var selectionTracker:SelectionTracker<Long>? = null
 
     override fun getItemId(position: Int): Long {
         return getItem(position)?.let {
