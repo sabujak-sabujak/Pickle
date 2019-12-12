@@ -51,7 +51,7 @@ class InstaFragment : Fragment() {
         viewModel.items.observe(this, Observer { pagedList ->
             instaAdapter.submitList(pagedList)
         })
-        preViewModel.scaleType.observe(this, Observer { scaleType ->
+        preViewModel.scaleType.observe(this, Observer {
             iv_preview.drawable?.let {
                 loadImageView(selectedPosition)
             }
@@ -68,6 +68,7 @@ class InstaFragment : Fragment() {
             viewModel = preViewModel
             recyclerView.adapter = instaAdapter
             recyclerView.layoutManager = gridLayoutManager
+//            previewLayout.setOnScrollChangeListener{null}
         }
 
         instaAdapter.itemClick = object : InstaAdapter.ItemClick {
@@ -78,7 +79,6 @@ class InstaFragment : Fragment() {
                 binding.previewLayout.setExpanded(true)
             }
         }
-//        binding.recyclerView.findViewHolderForAdapterPosition(0)?.itemView?.performClick()
         return binding.root
     }
 
