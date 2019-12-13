@@ -17,9 +17,9 @@ class PickleViewModel(application: Application) : AndroidViewModel(application),
     val selectionManager = SelectionManager()
 
     private val dataSourceFactory by lazy {
-        PickleDataSourceFactory(application, selectionManager, this)
+        PickleDataSourceFactory(application)
     }
-    val items: LiveData<PagedList<PickleMediaItem>> =
+    val items: LiveData<PagedList<PickleMedia>> =
         LivePagedListBuilder(dataSourceFactory, 50).build()
 
     fun invalidateDataSource(){

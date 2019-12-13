@@ -8,11 +8,11 @@ import androidx.recyclerview.widget.DiffUtil
 import kotlinx.android.synthetic.main.view_insta_media.view.*
 import life.sabujak.pickle.BR
 import life.sabujak.pickle.R
+import life.sabujak.pickle.data.entity.PickleMedia
 import life.sabujak.pickle.ui.common.BindingHolder
-import life.sabujak.pickle.ui.common.PickleMediaItem
 import life.sabujak.pickle.util.Logger
 
-class InstaAdapter : PagedListAdapter<PickleMediaItem, BindingHolder>(diffCallback) {
+class InstaAdapter : PagedListAdapter<PickleMedia, BindingHolder>(diffCallback) {
 
     val logger = Logger.getLogger("InstaAdapter")
 
@@ -26,12 +26,12 @@ class InstaAdapter : PagedListAdapter<PickleMediaItem, BindingHolder>(diffCallba
     var lastClickedPosition: Int = -1
 
     companion object {
-        val diffCallback = object : DiffUtil.ItemCallback<PickleMediaItem>() {
-            override fun areItemsTheSame(oldItem: PickleMediaItem, newItem: PickleMediaItem): Boolean {
+        val diffCallback = object : DiffUtil.ItemCallback<PickleMedia>() {
+            override fun areItemsTheSame(oldItem: PickleMedia, newItem: PickleMedia): Boolean {
                 return oldItem.getId() == newItem.getId()
             }
 
-            override fun areContentsTheSame(oldItem: PickleMediaItem, newItem: PickleMediaItem): Boolean {
+            override fun areContentsTheSame(oldItem: PickleMedia, newItem: PickleMedia): Boolean {
                 return oldItem.hashCode() == newItem.hashCode()
             }
         }
@@ -71,7 +71,7 @@ class InstaAdapter : PagedListAdapter<PickleMediaItem, BindingHolder>(diffCallba
         notifyDataSetChanged()
     }
 
-    fun getPickleMedia(position: Int): PickleMediaItem?{
+    fun getPickleMedia(position: Int): PickleMedia?{
         return getItem(position)
     }
 }

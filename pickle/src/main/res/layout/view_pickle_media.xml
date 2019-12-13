@@ -9,21 +9,23 @@
         <import type="android.view.View" />
         <variable
             name="item"
-            type="life.sabujak.pickle.ui.common.PickleMediaItem" />
+            type="life.sabujak.pickle.data.entity.PickleMedia" />
+        <variable
+            name="selectionManager"
+            type="life.sabujak.pickle.ui.common.SelectionManager" />
 
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:onClick="@{v->item.toggle()}"
         android:orientation="vertical">
         <ImageView
             android:id="@+id/image"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:scaleType="centerCrop"
-            app:pickleMedia="@{item.pickleMedia}"
+            app:pickleMedia="@{item}"
             app:layout_constraintDimensionRatio="1:1"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -32,15 +34,31 @@
             tools:src="@android:drawable/sym_def_app_icon"
             />
 
-        <View
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:background="#77000000"
-            android:visibility="@{item.checked? View.VISIBLE : View.GONE}"
-            app:layout_constraintBottom_toBottomOf="@id/image"
-            app:layout_constraintEnd_toEndOf="@id/image"
-            app:layout_constraintStart_toStartOf="@id/image"
-            app:layout_constraintTop_toTopOf="@id/image" />
+        <!--        <View-->
+        <!--            android:layout_width="0dp"-->
+        <!--            android:layout_height="0dp"-->
+        <!--            android:background="#77000000"-->
+        <!--            android:visibility="@{item.checked? View.VISIBLE : View.GONE}"-->
+        <!--            app:layout_constraintBottom_toBottomOf="@id/image"-->
+        <!--            app:layout_constraintEnd_toEndOf="@id/image"-->
+        <!--            app:layout_constraintStart_toStartOf="@id/image"-->
+        <!--            app:layout_constraintTop_toTopOf="@id/image" />-->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="4dp"
+            android:background="@{selectionManager.isChecked(item.id) ? @drawable/ic_item_selection_on : @drawable/ic_item_selection_off}"
+            android:gravity="center"
+            android:minWidth="30dp"
+            android:minHeight="30dp"
+            android:onClick="@{v->selectionManager.toggle(item.id)}"
+            android:textColor="@color/TC02"
+            android:text="@{selectionManager.getPosition(item.id)}"
+            app:layout_constraintDimensionRatio="1:1"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:background="@drawable/ic_item_selection_on"
+            tools:text="100" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

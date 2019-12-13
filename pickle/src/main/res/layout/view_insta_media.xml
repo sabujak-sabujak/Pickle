@@ -7,7 +7,7 @@
     <data>
         <variable
             name="item"
-            type="life.sabujak.pickle.ui.common.PickleMediaItem" />
+            type="life.sabujak.pickle.data.entity.PickleMedia" />
 
     </data>
 
@@ -19,7 +19,7 @@
             android:id="@+id/iv_media_item"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            app:pickleMedia="@{item.pickleMedia}"
+            app:pickleMedia="@{item}"
             android:scaleType="centerCrop"
             app:layout_constraintDimensionRatio="1:1"
             app:layout_constraintStart_toStartOf="parent"

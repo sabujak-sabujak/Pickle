@@ -27,7 +27,7 @@ class PickleFragment : Fragment() {
 
     lateinit var binding: FragmentPickleBinding
     lateinit var viewModel: PickleViewModel
-    private val adapter by lazy { PickleAdapter() }
+    private val adapter by lazy { PickleAdapter(viewModel.selectionManager) }
     private val gridLayoutManager by lazy {
         GridLayoutManager(
             context,
@@ -53,8 +53,8 @@ class PickleFragment : Fragment() {
         })
         optionMenuViewModel.clickEvent.observe(this, Observer {
             showToast("선택된 아이템은 로그에서 확인")
-            viewModel.selectionManager.selectionList.forEach { key, value ->
-                logger.i("$key : $value")
+            viewModel.selectionManager.selectionList.forEach { value ->
+                logger.i("$value")
             }
         })
 

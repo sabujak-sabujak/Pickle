@@ -82,7 +82,7 @@ class InstaFragment : Fragment() {
 
     fun loadImageView(position: Int) {
         val selected = instaAdapter.getPickleMedia(position)
-        selected?.pickleMedia?.getUri()?.let {
+        selected?.getUri()?.let {
             when (preViewModel.scaleType.value) {
                 GlideScaleType.CENTER_CROP -> Glide.with(iv_preview).load(it).centerCrop().into(iv_preview)
                 GlideScaleType.CENTER_INSIDE -> Glide.with(iv_preview).load(it).centerInside().into(iv_preview)

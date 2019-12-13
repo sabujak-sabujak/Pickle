@@ -1,21 +1,28 @@
 package life.sabujak.pickle.ui.common
 
-import android.util.SparseBooleanArray
-import androidx.core.util.forEach
+import androidx.databinding.BaseObservable
 import life.sabujak.pickle.util.InitMutableLiveData
 
-class SelectionManager {
-    val selectionList = SparseBooleanArray()
+class SelectionManager : BaseObservable(){
+    val selectionList = ArrayList<Long>()
 
     val count = InitMutableLiveData(0)
 
     fun setChecked(id: Long, checked: Boolean) {
-        selectionList.put(id.toInt(), checked)
-        updateCount()
+        if (
+            if (checked) {
+                selectionList.add(id)
+            } else {
+                selectionList.remove(id)
+            }
+        ) {
+            updateCount()
+        }
+        notifyChange()
     }
 
     fun isChecked(id: Long): Boolean {
-        return selectionList.get(id.toInt(), false)
+        return selectionList.contains(id)
     }
 
     fun toggle(id: Long) {
@@ -23,10 +30,18 @@ class SelectionManager {
     }
 
     private fun updateCount(){
-        var count = 0
-        selectionList.forEach { key, value -> if(value) count++}
-        this.count.value = count
+        this.count.value = selectionList.size
     }
 
-
+    fun getIndex(id: Long): Int{
+        return selectionList.indexOf(id)
+    }
+    fun getPosition(id:Long):String{
+        val index = getIndex(id)
+        return if(index ==-1){
+            ""
+        }else{
+            "${index+1}"
+        }
+    }
 }
