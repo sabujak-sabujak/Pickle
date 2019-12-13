@@ -77,6 +77,7 @@ class PickleActivity : AppCompatActivity() {
             Observer {
                 logger.i("onChangedEvent From PickleContentObserver")
                 viewModel.invalidateDataSource()
+                viewModel.selectionManager.removeSelectedIdsIfNotExists(contentResolver)
             }
         )
     }
