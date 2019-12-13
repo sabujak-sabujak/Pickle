@@ -2,8 +2,10 @@ package life.sabujak.pickle.ui.common
 
 import android.content.ContentResolver
 import android.content.ContentUris
+import android.net.Uri
 import android.provider.MediaStore
 import androidx.databinding.BaseObservable
+import io.reactivex.rxkotlin.toObservable
 import life.sabujak.pickle.data.PickleDataSource
 import life.sabujak.pickle.util.InitMutableLiveData
 import life.sabujak.pickle.util.Logger
@@ -67,4 +69,13 @@ class SelectionManager : BaseObservable(){
         }
         notifyChange()
     }
+
+    fun getSelectedUris(): Array<Uri> {
+        return selectionList.toObservable()
+            .map { id-> ContentUris.withAppendedId(PickleDataSource.uri, id)}
+            .toList()
+            .blockingGet()
+            .toTypedArray()
+    }
+
 }

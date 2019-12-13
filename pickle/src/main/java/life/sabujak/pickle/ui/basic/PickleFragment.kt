@@ -1,6 +1,8 @@
 package life.sabujak.pickle.ui.basic
 
+import android.app.Activity
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -10,6 +12,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.GridLayoutManager
+import life.sabujak.pickle.Pickle
 import life.sabujak.pickle.R
 import life.sabujak.pickle.data.entity.PickleMedia
 import life.sabujak.pickle.databinding.FragmentPickleBinding
@@ -68,9 +71,12 @@ class PickleFragment : Fragment(),OnEventListener {
             adapter.submitList(pagedList)
         })
         optionMenuViewModel.clickEvent.observe(viewLifecycleOwner, Observer {
-            showToast("선택된 아이템은 로그에서 확인")
-            viewModel.selectionManager.selectionList.forEach { value ->
-                logger.i("$value")
+            activity?.let {
+                it.setResult(Activity.RESULT_OK, Intent().apply {
+                    putExtra(Pickle.KEY_DATA, viewModel.selectionManager.getSelectedUris())
+                })
+                it.finish()
+
             }
         })
 
