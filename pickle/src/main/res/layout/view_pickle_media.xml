@@ -13,12 +13,17 @@
         <variable
             name="selectionManager"
             type="life.sabujak.pickle.ui.common.SelectionManager" />
+        <variable
+            name="onEventListener"
+            type="life.sabujak.pickle.ui.common.OnEventListener" />
 
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:onLongClick="@{v->onEventListener.onItemLongClick(item)}"
+        app:onClick="@{v->onEventListener.onItemClick(item)}"
         android:orientation="vertical">
         <ImageView
             android:id="@+id/image"

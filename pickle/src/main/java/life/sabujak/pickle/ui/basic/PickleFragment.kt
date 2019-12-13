@@ -13,7 +13,9 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.GridLayoutManager
 import life.sabujak.pickle.R
+import life.sabujak.pickle.data.entity.PickleMedia
 import life.sabujak.pickle.databinding.FragmentPickleBinding
+import life.sabujak.pickle.ui.common.OnEventListener
 import life.sabujak.pickle.ui.common.OptionMenuViewModel
 import life.sabujak.pickle.ui.common.PickleViewModel
 import life.sabujak.pickle.util.Calculator
@@ -21,13 +23,13 @@ import life.sabujak.pickle.util.Logger
 import life.sabujak.pickle.util.ext.showToast
 
 
-class PickleFragment : Fragment() {
+class PickleFragment : Fragment(),OnEventListener {
 
     val logger = Logger.getLogger(PickleFragment::class.java.simpleName)
 
     lateinit var binding: FragmentPickleBinding
     lateinit var viewModel: PickleViewModel
-    private val adapter by lazy { PickleAdapter(viewModel.selectionManager) }
+    private val adapter by lazy { PickleAdapter(lifecycle, viewModel.selectionManager, this) }
     private val gridLayoutManager by lazy {
         GridLayoutManager(
             context,
@@ -74,4 +76,14 @@ class PickleFragment : Fragment() {
         binding.recyclerView.layoutManager = gridLayoutManager
         return binding.root
     }
+
+    override fun onItemClick(pickleMedia: PickleMedia) {
+        showToast("${pickleMedia.getId()}")
+    }
+
+    override fun onItemLongClick(pickleMedia: PickleMedia): Boolean {
+        showToast("${pickleMedia.getId()}")
+        return false
+    }
+
 }

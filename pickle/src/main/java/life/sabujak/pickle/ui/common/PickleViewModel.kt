@@ -9,8 +9,7 @@ import life.sabujak.pickle.data.PickleDataSourceFactory
 import life.sabujak.pickle.data.entity.PickleMedia
 import life.sabujak.pickle.util.Logger
 
-class PickleViewModel(application: Application) : AndroidViewModel(application),
-    OnPickleEventListener {
+class PickleViewModel(application: Application) : AndroidViewModel(application){
 
     private val logger = Logger.getLogger(PickleViewModel::class.java.simpleName)
 
@@ -30,13 +29,6 @@ class PickleViewModel(application: Application) : AndroidViewModel(application),
         dataSourceFactory.closeCursor()
     }
 
-    override fun onItemClick(pickleMedia: PickleMedia) {
-
-    }
-
-    override fun onItemLongClick(pickleMedia: PickleMedia): Boolean {
-        return false
-    }
 
 
 }
