@@ -5,8 +5,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
-import androidx.core.util.forEach
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
@@ -50,19 +48,6 @@ class PickleFragment : Fragment(),OnEventListener {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
         logger.d("onCreate")
-        viewModel.items.observe(this, Observer { pagedList ->
-            adapter.submitList(pagedList)
-        })
-        optionMenuViewModel.clickEvent.observe(this, Observer {
-            showToast("선택된 아이템은 로그에서 확인")
-            viewModel.selectionManager.selectionList.forEach { value ->
-                logger.i("$value")
-            }
-        })
-
-        viewModel.selectionManager.count.observe(this, Observer {
-            optionMenuViewModel.count.value = it
-        })
     }
 
     override fun onCreateView(
@@ -75,6 +60,30 @@ class PickleFragment : Fragment(),OnEventListener {
         binding.lifecycleOwner = viewLifecycleOwner
         binding.recyclerView.layoutManager = gridLayoutManager
         return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        viewModel.items.observe(viewLifecycleOwner, Observer { pagedList ->
+            adapter.submitList(pagedList)
+        })
+        optionMenuViewModel.clickEvent.observe(viewLifecycleOwner, Observer {
+            showToast("선택된 아이템은 로그에서 확인")
+            viewModel.selectionManager.selectionList.forEach { value ->
+                logger.i("$value")
+            }
+        })
+
+        viewModel.selectionManager.count.observe(viewLifecycleOwner, Observer {
+            optionMenuViewModel.count.value = it
+        })
+
+        viewModel.initialLoadState.observe(viewLifecycleOwner, Observer {
+            logger.d("initialLoadState = $it")
+        } )
+        viewModel.dataSourceState.observe(viewLifecycleOwner, Observer {
+            logger.d("dataSourceState = $it")
+        })
     }
 
     override fun onItemClick(pickleMedia: PickleMedia) {

@@ -3,6 +3,7 @@ package life.sabujak.pickle.ui.common
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.Transformations
 import androidx.paging.LivePagedListBuilder
 import androidx.paging.PagedList
 import life.sabujak.pickle.data.PickleDataSourceFactory
@@ -21,6 +22,15 @@ class PickleViewModel(application: Application) : AndroidViewModel(application){
     val items: LiveData<PagedList<PickleMedia>> =
         LivePagedListBuilder(dataSourceFactory, 50).build()
 
+    val initialLoadState =
+        Transformations.switchMap(dataSourceFactory.liveDataSource) { it.initialLoad }
+    val dataSourceState =
+        Transformations.switchMap(dataSourceFactory.liveDataSource) { it.dataSourceState }
+
+    init {
+        dataSourceFactory.liveDataSource
+    }
+
     fun invalidateDataSource(){
         dataSourceFactory.invalidate()
     }
@@ -28,7 +38,5 @@ class PickleViewModel(application: Application) : AndroidViewModel(application){
         super.onCleared()
         dataSourceFactory.closeCursor()
     }
-
-
 
 }

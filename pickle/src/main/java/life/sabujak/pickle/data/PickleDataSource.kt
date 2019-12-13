@@ -5,87 +5,74 @@ import android.content.ContentUris
 import android.content.Context
 import android.database.Cursor
 import android.provider.MediaStore
+import androidx.lifecycle.MutableLiveData
 import androidx.paging.PositionalDataSource
-import life.sabujak.pickle.data.entity.Photo
+import life.sabujak.pickle.data.entity.Image
 import life.sabujak.pickle.data.entity.PickleMedia
 import life.sabujak.pickle.data.entity.Video
+import life.sabujak.pickle.util.CursorFactory
+import life.sabujak.pickle.util.DataSourceState
 import life.sabujak.pickle.util.Logger
+import life.sabujak.pickle.util.PhotoVideoCursor
 
 /**
- * query time 660ms for 180,185(Images and Videos)
+ * Last query time 660ms for 180,185(Images and Videos)
  */
 class PickleDataSource(val context: Context) : PositionalDataSource<PickleMedia>(){
     val logger = Logger.getLogger(PickleDataSource::class.java.simpleName)
 
-    lateinit var cursor:Cursor
+    var cursor: Cursor? = null
     companion object{
         val uri = MediaStore.Files.getContentUri(MediaStore.VOLUME_EXTERNAL)
     }
+
+    val initialLoad = MutableLiveData<DataSourceState>()
+    val dataSourceState = MutableLiveData<DataSourceState>()
 
     override fun loadInitial(
         params: LoadInitialParams,
         callback: LoadInitialCallback<PickleMedia>
     ) {
-
-        var time = System.currentTimeMillis()
-
-        val projection = arrayOf(
-            MediaStore.Files.FileColumns._ID,
-            MediaStore.Files.FileColumns.DATA,
-            MediaStore.Files.FileColumns.MEDIA_TYPE,
-            MediaStore.Files.FileColumns.DATE_MODIFIED,
-            MediaStore.Files.FileColumns.SIZE,
-            MediaStore.Video.VideoColumns.DURATION
-        )
-
-        val selection = "" +
-                "${MediaStore.Files.FileColumns.MEDIA_TYPE}=?" +
-                " OR " +
-                "${MediaStore.Files.FileColumns.MEDIA_TYPE}=?"
-
-        val selectionArgs = arrayOf(
-            "${MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE}",
-            "${MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO}"
-        )
-
-        val sortOrder = String.format("%s %s", MediaStore.MediaColumns.DATE_ADDED, "desc")
-
-        cursor = context.contentResolver.query(uri, projection, selection, selectionArgs, sortOrder)!!
-        logger.d("query time = ${System.currentTimeMillis()-time}")
-        logger.d("cursor size = ${cursor.count}")
-
-        time = System.currentTimeMillis()
-        val mediaList = ArrayList<PickleMedia>()
-        if(cursor.count ==0){
-            return
-        }
-        for(i in 0 until params.requestedLoadSize){
-            if(!cursor.moveToNext()){
-                break
+        initialLoad.postValue(DataSourceState.LOADING)
+        cursor = CursorFactory(context).getCursor(PhotoVideoCursor::class)
+        cursor?.let {
+            if(it.count==0){
+                return
             }
-            val media = getPickleMedia(cursor)
-            mediaList.add(media)
+            val list = getMediaList(it, params.requestedLoadSize)
+            callback.onResult(list, 0, it.count)
+            initialLoad.postValue(DataSourceState.LOADED)
+        }?: kotlin.run {
+            initialLoad.postValue(DataSourceState.error("Cursor is null"))
         }
-        logger.d("loop time = ${System.currentTimeMillis()-time}")
-        callback.onResult(mediaList, 0, cursor.count)
-
     }
 
     override fun loadRange(params: LoadRangeParams, callback: LoadRangeCallback<PickleMedia>) {
         logger.d("loadRange : startPostion = ${params.startPosition} loadSize = ${params.loadSize}")
-        val mediaList = ArrayList<PickleMedia>()
-        for(i in 0 until params.loadSize){
-            if(!cursor.moveToNext()){
-                break
-            }
-            val media = getPickleMedia(cursor)
-            mediaList.add(media)
-        }
-        callback.onResult(mediaList)
+        dataSourceState.postValue(DataSourceState.LOADING)
+        callback.onResult(getMediaList(cursor, params.loadSize))
+        dataSourceState.postValue(DataSourceState.LOADED)
     }
 
+    private fun getMediaList(cursor: Cursor?, loadSize: Int): ArrayList<PickleMedia> {
+        val mediaList = ArrayList<PickleMedia>()
+        cursor?.let {
+            for (i in 0 until loadSize) {
+                if (!it.moveToNext()) {
+                    break
+                }
+                val media = makePickleMedia(it)
+                mediaList.add(media)
+            }
+            return mediaList
+        } ?: run {
+            return mediaList
+        }
+    }
+
+
     @SuppressLint("InlinedApi")
-    private fun getPickleMedia(cursor:Cursor):PickleMedia{
+    private fun makePickleMedia(cursor: Cursor): PickleMedia {
         val id = cursor.getLong(cursor.getColumnIndex(MediaStore.Files.FileColumns._ID))
         val contentUri = ContentUris.withAppendedId(uri, id)
         val data = cursor.getString(cursor.getColumnIndex(MediaStore.Files.FileColumns.DATA))
@@ -97,16 +84,17 @@ class PickleDataSource(val context: Context) : PositionalDataSource<PickleMedia>
             val duration = cursor.getLong(cursor.getColumnIndex(MediaStore.Video.VideoColumns.DURATION))
             Video(id,contentUri, data, dateModified, fileSize,duration)
         }else{
-            Photo(id,contentUri, data, dateModified, fileSize)
+            Image(id, contentUri, data, dateModified, fileSize)
         }
     }
 
     fun closeCursor(){
-        if(!cursor.isClosed){
-            cursor.close()
+        cursor?.let {
+            if (!it.isClosed) {
+                it.close()
+            }
         }
     }
-
 
 
 }
