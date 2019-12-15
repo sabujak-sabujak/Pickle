@@ -71,7 +71,7 @@ class InstaAdapter : PagedListAdapter<PickleMedia, BindingHolder>(diffCallback) 
         notifyDataSetChanged()
     }
 
-    fun getPickleMeida(position: Int): PickleMedia?{
+    fun getPickleMedia(position: Int): PickleMedia?{
         return getItem(position)
     }
 }

@@ -3,7 +3,6 @@ package life.sabujak.pickle.ui.insta
 import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
-import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
@@ -25,10 +24,10 @@ class InstaFragment : Fragment() {
     val logger = Logger.getLogger("InstaFragment")
 
     lateinit var binding: FragmentInstaBinding
-    lateinit var viewModel: PickleViewModel
+    lateinit var pickleViewModel: PickleViewModel
     lateinit var preViewModel: PreViewModel
-    val instaAdapter = InstaAdapter()
-    val gridLayoutManager by lazy {
+    private val instaAdapter = InstaAdapter()
+    private val gridLayoutManager by lazy {
         GridLayoutManager(context, 3)
     }
     var selectedPosition: Int = -1
@@ -37,7 +36,7 @@ class InstaFragment : Fragment() {
         super.onAttach(context)
         (activity as AppCompatActivity).supportActionBar?.hide()
         activity?.let {
-            viewModel = ViewModelProviders.of(it).get(PickleViewModel::class.java)
+            pickleViewModel = ViewModelProviders.of(it).get(PickleViewModel::class.java)
             preViewModel = ViewModelProviders.of(it).get(PreViewModel::class.java)
         }
     }
@@ -45,7 +44,7 @@ class InstaFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         logger.d("onCreate")
-        viewModel.items.observe(this, Observer { pagedList ->
+        pickleViewModel.items.observe(this, Observer { pagedList ->
             instaAdapter.submitList(pagedList)
         })
         preViewModel.scaleType.observe(this, Observer {
@@ -60,15 +59,16 @@ class InstaFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        logger.d("onCreateView")
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_insta, container, false)
         binding.apply {
             viewModel = preViewModel
             recyclerView.adapter = instaAdapter
             recyclerView.layoutManager = gridLayoutManager
             val appBar = previewAppbarLayout as AppBarLayout
-            appBar.layoutParams?.let{
+            appBar.layoutParams?.let {
                 val behavior = AppBarLayout.Behavior()
-                behavior.setDragCallback(object: AppBarLayout.Behavior.DragCallback(){
+                behavior.setDragCallback(object : AppBarLayout.Behavior.DragCallback() {
                     override fun canDrag(p0: AppBarLayout): Boolean {
                         return false
                     }
@@ -93,12 +93,18 @@ class InstaFragment : Fragment() {
     }
 
     fun loadImageView(position: Int) {
-        val selected = instaAdapter.getPickleMeida(position)
+        logger.d("loadImageView")
+        val selected = instaAdapter.getPickleMedia(position)
         selected?.getUri()?.let {
             when (preViewModel.scaleType.value) {
-                GlideScaleType.CENTER_CROP -> Glide.with(iv_preview).load(it).centerCrop().into(iv_preview)
-                GlideScaleType.CENTER_INSIDE -> Glide.with(iv_preview).load(it).centerInside().into(iv_preview)
-                else -> {}
+                GlideScaleType.CENTER_CROP -> Glide.with(iv_preview).load(it).centerCrop().into(
+                    iv_preview
+                )
+                GlideScaleType.CENTER_INSIDE -> Glide.with(iv_preview).load(it).centerInside().into(
+                    iv_preview
+                )
+                else -> {
+                }
             }
         }
     }

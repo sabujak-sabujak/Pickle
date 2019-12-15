@@ -1,7 +1,5 @@
 package life.sabujak.pickle.ui.insta
 
-import android.widget.ImageView
-import androidx.databinding.BindingAdapter
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -16,6 +14,5 @@ class PreViewModel : ViewModel() {
     fun ratioClicked() {
         if (_scaleType.value == GlideScaleType.CENTER_CROP) _scaleType.value = GlideScaleType.CENTER_INSIDE
         else _scaleType.value = GlideScaleType.CENTER_CROP
-
     }
 }
