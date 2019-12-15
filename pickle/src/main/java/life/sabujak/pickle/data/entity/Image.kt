@@ -2,7 +2,7 @@ package life.sabujak.pickle.data.entity
 
 import android.net.Uri
 
-data class Photo(
+data class Image(
     private val id:Long,
     private val uri: Uri?,
     private val data: String?,

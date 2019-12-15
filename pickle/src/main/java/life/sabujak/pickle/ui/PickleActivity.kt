@@ -1,6 +1,7 @@
 package life.sabujak.pickle.ui
 
 import android.os.Bundle
+import android.view.Menu
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
@@ -10,6 +11,8 @@ import io.reactivex.disposables.CompositeDisposable
 import life.sabujak.pickle.R
 import life.sabujak.pickle.data.PickleContentObserver
 import life.sabujak.pickle.databinding.ActivityPickleBinding
+import life.sabujak.pickle.ui.common.OptionMenuViewModel
+import life.sabujak.pickle.ui.common.PickleViewModel
 import life.sabujak.pickle.util.Logger
 import life.sabujak.pickle.util.PicklePermission
 
@@ -20,6 +23,7 @@ class PickleActivity : AppCompatActivity() {
         PicklePermission(this)
     private val disposables = CompositeDisposable()
     private val viewModel: PickleViewModel by viewModels()
+    private val optionMenuViewModel: OptionMenuViewModel by viewModels()
 
     private lateinit var binding: ActivityPickleBinding
     private lateinit var contentObserver: PickleContentObserver
@@ -37,6 +41,11 @@ class PickleActivity : AppCompatActivity() {
                 finish()
             }
         })
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        optionMenuViewModel.onCreateOptionMenu(menu)
+        return super.onCreateOptionsMenu(menu)
     }
 
     private fun initUI(){
@@ -68,6 +77,7 @@ class PickleActivity : AppCompatActivity() {
             Observer {
                 logger.i("onChangedEvent From PickleContentObserver")
                 viewModel.invalidateDataSource()
+                viewModel.selectionManager.removeSelectedIdsIfNotExists(contentResolver)
             }
         )
     }

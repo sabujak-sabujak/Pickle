@@ -9,7 +9,7 @@ import kotlinx.android.synthetic.main.view_insta_media.view.*
 import life.sabujak.pickle.BR
 import life.sabujak.pickle.R
 import life.sabujak.pickle.data.entity.PickleMedia
-import life.sabujak.pickle.ui.BindingHolder
+import life.sabujak.pickle.ui.common.BindingHolder
 import life.sabujak.pickle.util.Logger
 
 class InstaAdapter : PagedListAdapter<PickleMedia, BindingHolder>(diffCallback) {
@@ -41,14 +41,14 @@ class InstaAdapter : PagedListAdapter<PickleMedia, BindingHolder>(diffCallback) 
         return R.layout.view_insta_media
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BindingHolder{
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BindingHolder {
         return BindingHolder(parent, viewType)
     }
 
     override fun onBindViewHolder(holder: BindingHolder, position: Int) {
         val item = getItem(position)
         item?.let {
-            holder.binding.setVariable(BR.pickleMedia,item)
+            holder.binding.setVariable(BR.item,item)
             holder.itemView.v_cover.visibility = if(isItemSelected(position)) { View.VISIBLE} else {View.INVISIBLE}
             holder.itemView.setOnClickListener{v->
                 logger.d("item Clicked ")

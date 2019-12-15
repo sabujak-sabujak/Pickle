@@ -5,24 +5,32 @@
     >
 
     <data>
+
+        <import type="android.view.View" />
         <variable
-            name="pickleMedia"
+            name="item"
             type="life.sabujak.pickle.data.entity.PickleMedia" />
         <variable
-            name="selectionTracker"
-            type="androidx.recyclerview.selection.SelectionTracker&lt;Long>" />
+            name="selectionManager"
+            type="life.sabujak.pickle.ui.common.SelectionManager" />
+        <variable
+            name="onEventListener"
+            type="life.sabujak.pickle.ui.common.OnEventListener" />
 
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:onLongClick="@{v->onEventListener.onItemLongClick(item)}"
+        app:onClick="@{v->onEventListener.onItemClick(item)}"
         android:orientation="vertical">
         <ImageView
+            android:id="@+id/image"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            app:pickleMedia="@{pickleMedia}"
             android:scaleType="centerCrop"
+            app:pickleMedia="@{item}"
             app:layout_constraintDimensionRatio="1:1"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -31,15 +39,32 @@
             tools:src="@android:drawable/sym_def_app_icon"
             />
 
-        <CheckBox
-            android:id="@+id/checkbox"
+        <!--        <View-->
+        <!--            android:layout_width="0dp"-->
+        <!--            android:layout_height="0dp"-->
+        <!--            android:background="#77000000"-->
+        <!--            android:visibility="@{item.checked? View.VISIBLE : View.GONE}"-->
+        <!--            app:layout_constraintBottom_toBottomOf="@id/image"-->
+        <!--            app:layout_constraintEnd_toEndOf="@id/image"-->
+        <!--            app:layout_constraintStart_toStartOf="@id/image"-->
+        <!--            app:layout_constraintTop_toTopOf="@id/image" />-->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="4dp"
+            android:background="@{selectionManager.isChecked(item.id) ? @drawable/ic_item_selection_on : @drawable/ic_item_selection_off}"
+            android:gravity="center"
+            android:minWidth="30dp"
+            android:minHeight="30dp"
+            android:onClick="@{v->selectionManager.toggle(item.id)}"
+            android:textColor="@color/TC02"
+            android:text="@{selectionManager.getPosition(item.id)}"
+            app:layout_constraintDimensionRatio="1:1"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="16dp"
-            android:checked="@{selectionTracker.isSelected(pickleMedia.getId())}"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+            tools:background="@drawable/ic_item_selection_on"
+            tools:text="100" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </layout>

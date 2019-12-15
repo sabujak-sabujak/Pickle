@@ -17,7 +17,7 @@ import com.google.android.material.appbar.AppBarLayout
 import kotlinx.android.synthetic.main.fragment_insta.*
 import life.sabujak.pickle.R
 import life.sabujak.pickle.databinding.FragmentInstaBinding
-import life.sabujak.pickle.ui.PickleViewModel
+import life.sabujak.pickle.ui.common.PickleViewModel
 import life.sabujak.pickle.util.Logger
 
 class InstaFragment : Fragment() {
@@ -34,8 +34,8 @@ class InstaFragment : Fragment() {
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        (activity as AppCompatActivity).supportActionBar?.hide()
         activity?.let {
+            (it as? AppCompatActivity)?.supportActionBar?.hide()
             pickleViewModel = ViewModelProviders.of(it).get(PickleViewModel::class.java)
             preViewModel = ViewModelProviders.of(it).get(PreViewModel::class.java)
         }

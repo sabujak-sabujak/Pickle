@@ -1,6 +1,8 @@
 package life.sabujak.pickle.ui.basic
 
+import android.app.Activity
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -9,53 +11,46 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
-import androidx.recyclerview.selection.SelectionPredicates
-import androidx.recyclerview.selection.SelectionTracker
-import androidx.recyclerview.selection.StableIdKeyProvider
-import androidx.recyclerview.selection.StorageStrategy
 import androidx.recyclerview.widget.GridLayoutManager
+import life.sabujak.pickle.Pickle
 import life.sabujak.pickle.R
+import life.sabujak.pickle.data.entity.PickleMedia
 import life.sabujak.pickle.databinding.FragmentPickleBinding
-import life.sabujak.pickle.ui.PickleViewModel
+import life.sabujak.pickle.ui.common.OnEventListener
+import life.sabujak.pickle.ui.common.OptionMenuViewModel
+import life.sabujak.pickle.ui.common.PickleViewModel
 import life.sabujak.pickle.util.Calculator
 import life.sabujak.pickle.util.Logger
+import life.sabujak.pickle.util.ext.showToast
 
 
-class PickleFragment : Fragment() {
+class PickleFragment : Fragment(),OnEventListener {
 
     val logger = Logger.getLogger(PickleFragment::class.java.simpleName)
 
     lateinit var binding: FragmentPickleBinding
     lateinit var viewModel: PickleViewModel
-    private val adapter = PickleAdapter()
+    private val adapter by lazy { PickleAdapter(lifecycle, viewModel.selectionManager, this) }
     private val gridLayoutManager by lazy {
-        GridLayoutManager(context, Calculator.getColumnCount(context, R.dimen.pickle_column_width))
-    }
-    val selectionTracker: SelectionTracker<Long> by lazy {
-        SelectionTracker.Builder<Long>(
-            "id_${PickleFragment::class.java.simpleName}",
-            binding.recyclerView,
-            StableIdKeyProvider(binding.recyclerView),
-            PickleDetailsLookUp(binding.recyclerView),
-            StorageStrategy.createLongStorage()
+        GridLayoutManager(
+            context,
+            Calculator.getColumnCount(context, R.dimen.pickle_column_width)
         )
-            .withSelectionPredicate(SelectionPredicates.createSelectAnything())
-            .build()
     }
+    lateinit var optionMenuViewModel :OptionMenuViewModel
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
         activity?.let {
             viewModel = ViewModelProviders.of(it).get(PickleViewModel::class.java)
+            optionMenuViewModel = ViewModelProviders.of(it).get(OptionMenuViewModel::class.java)
         }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setHasOptionsMenu(true)
         logger.d("onCreate")
-        viewModel.items.observe(this, Observer { pagedList ->
-            adapter.submitList(pagedList)
-        })
     }
 
     override fun onCreateView(
@@ -67,9 +62,43 @@ class PickleFragment : Fragment() {
         binding.recyclerView.adapter = adapter
         binding.lifecycleOwner = viewLifecycleOwner
         binding.recyclerView.layoutManager = gridLayoutManager
-        adapter.selectionTracker = selectionTracker
         return binding.root
     }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        viewModel.items.observe(viewLifecycleOwner, Observer { pagedList ->
+            adapter.submitList(pagedList)
+        })
+        optionMenuViewModel.clickEvent.observe(viewLifecycleOwner, Observer {
+            activity?.let {
+                it.setResult(Activity.RESULT_OK, Intent().apply {
+                    putExtra(Pickle.KEY_DATA, viewModel.selectionManager.getSelectedUris())
+                })
+                it.finish()
+
+            }
+        })
+
+        viewModel.selectionManager.count.observe(viewLifecycleOwner, Observer {
+            optionMenuViewModel.count.value = it
+        })
+
+        viewModel.initialLoadState.observe(viewLifecycleOwner, Observer {
+            logger.d("initialLoadState = $it")
+        } )
+        viewModel.dataSourceState.observe(viewLifecycleOwner, Observer {
+            logger.d("dataSourceState = $it")
+        })
+    }
+
+    override fun onItemClick(pickleMedia: PickleMedia) {
+        showToast("${pickleMedia.getId()}")
+    }
+
+    override fun onItemLongClick(pickleMedia: PickleMedia): Boolean {
+        showToast("${pickleMedia.getId()}")
+        return false
+    }
 
 }

@@ -1,25 +1,27 @@
 package life.sabujak.pickle.data
 
 import android.content.Context
+import androidx.lifecycle.MutableLiveData
 import androidx.paging.DataSource
 import life.sabujak.pickle.data.entity.PickleMedia
 
 
 class PickleDataSourceFactory(val context :Context) : DataSource.Factory<Int, PickleMedia>() {
 
-    var dataSource:PickleDataSource? = null
+    val liveDataSource = MutableLiveData<PickleDataSource>()
     override fun create(): DataSource<Int, PickleMedia> {
         closeCursor()
-        dataSource = PickleDataSource(context)
-        return dataSource!!
+        val dataSource = PickleDataSource(context)
+        liveDataSource.postValue(dataSource)
+        return dataSource
     }
 
     fun invalidate(){
-        dataSource?.invalidate()
+        liveDataSource.value?.invalidate()
     }
 
     fun closeCursor(){
-        dataSource?.closeCursor()
+        liveDataSource.value?.closeCursor()
     }
 
 }

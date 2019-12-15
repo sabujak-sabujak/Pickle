@@ -4,7 +4,7 @@
     <data>
         <variable
             name="viewModel"
-            type="life.sabujak.pickle.ui.PickleViewModel"/>
+            type="life.sabujak.pickle.ui.common.PickleViewModel"/>
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout

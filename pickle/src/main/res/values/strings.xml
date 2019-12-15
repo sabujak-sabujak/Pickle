@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">pickle</string>
+    <string name="confirm">OK</string>
+    <string name="select">Select</string>
 </resources>
