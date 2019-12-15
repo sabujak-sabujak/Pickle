@@ -12,6 +12,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.google.android.material.appbar.AppBarLayout
 import kotlinx.android.synthetic.main.fragment_insta.*
@@ -19,6 +20,7 @@ import life.sabujak.pickle.R
 import life.sabujak.pickle.databinding.FragmentInstaBinding
 import life.sabujak.pickle.ui.common.PickleViewModel
 import life.sabujak.pickle.util.Logger
+import life.sabujak.pickle.util.Status
 
 class InstaFragment : Fragment() {
     val logger = Logger.getLogger("InstaFragment")
@@ -44,14 +46,6 @@ class InstaFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         logger.d("onCreate")
-        pickleViewModel.items.observe(this, Observer { pagedList ->
-            instaAdapter.submitList(pagedList)
-        })
-        preViewModel.scaleType.observe(this, Observer {
-            iv_preview.drawable?.let {
-                loadImageView(selectedPosition)
-            }
-        })
     }
 
     override fun onCreateView(
@@ -75,14 +69,18 @@ class InstaFragment : Fragment() {
                 })
                 (it as CoordinatorLayout.LayoutParams).behavior = behavior
             }
+            (activity as? AppCompatActivity)?.setSupportActionBar(binding.toolbar)
+//            (activity as? AppCompatActivity)?.supportActionBar?.setDisplayHomeAsUpEnabled(true)
         }
 
         instaAdapter.itemClick = object : InstaAdapter.ItemClick {
-            override fun onClick(view: View, position: Int) {
+            override fun onClick(view: View?, position: Int) {
                 selectedPosition = position
                 loadImageView(position)
-                binding.recyclerView.smoothScrollBy(0, view.top)
-                binding.previewAppbarLayout.setExpanded(true)
+                view?.let{
+                    binding.recyclerView.smoothScrollBy(0, it.top)
+                    binding.previewAppbarLayout.setExpanded(true)
+                }
             }
         }
         return binding.root
@@ -90,6 +88,32 @@ class InstaFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        pickleViewModel.items.observe(viewLifecycleOwner, Observer { pagedList ->
+            instaAdapter.submitList(pagedList)
+        })
+        preViewModel.scaleType.observe(viewLifecycleOwner, Observer {
+            iv_preview.drawable?.let {
+                loadImageView(selectedPosition)
+            }
+        })
+//        pickleViewModel.initialLoadState.observe(viewLifecycleOwner, Observer {
+//            logger.d("initialLoadState = $it")
+//            instaAdapter.registerAdapterDataObserver(RecyclerView.AdapterDataObserver() {
+//
+//            })
+//
+//
+//            })
+//            if(it.status == Status.SUCCESS) {
+////                instaAdapter.itemClick?.onClick(null, 0)
+////                binding.recyclerView.layoutManager?.getChildAt(0)?.performClick()
+////                val view = binding.recyclerView.findViewHolderForAdapterPosition(0)
+////                binding.recyclerView.findViewHolderForLayoutPosition(0)?.itemView?.performClick()
+//
+////                binding.recyclerView.findViewHolderForAdapterPosition(0)?.itemView?.performClick()
+//            }
+//
+//        } )
     }
 
     fun loadImageView(position: Int) {
