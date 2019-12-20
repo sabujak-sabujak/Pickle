@@ -59,7 +59,7 @@ class InstaFragment : Fragment() {
             viewModel = preViewModel
             recyclerView.adapter = instaAdapter
             recyclerView.layoutManager = gridLayoutManager
-            val appBar = previewAppbarLayout as AppBarLayout
+            val appBar = previewAppbarLayout
             appBar.layoutParams?.let {
                 val behavior = AppBarLayout.Behavior()
                 behavior.setDragCallback(object : AppBarLayout.Behavior.DragCallback() {
@@ -70,14 +70,13 @@ class InstaFragment : Fragment() {
                 (it as CoordinatorLayout.LayoutParams).behavior = behavior
             }
             (activity as? AppCompatActivity)?.setSupportActionBar(binding.toolbar)
-//            (activity as? AppCompatActivity)?.supportActionBar?.setDisplayHomeAsUpEnabled(true)
         }
 
         instaAdapter.itemClick = object : InstaAdapter.ItemClick {
             override fun onClick(view: View?, position: Int) {
                 selectedPosition = position
                 loadImageView(position)
-                view?.let{
+                view?.let {
                     binding.recyclerView.smoothScrollBy(0, it.top)
                     binding.previewAppbarLayout.setExpanded(true)
                 }
@@ -92,11 +91,11 @@ class InstaFragment : Fragment() {
             instaAdapter.submitList(pagedList)
         })
         preViewModel.scaleType.observe(viewLifecycleOwner, Observer {
-            iv_preview.drawable?.let {
-                loadImageView(selectedPosition)
-            }
+//            iv_preview.drawable?.let {
+//                loadImageView(selectedPosition)
+//            }
         })
-//        pickleViewModel.initialLoadState.observe(viewLifecycleOwner, Observer {
+        //        pickleViewModel.initialLoadState.observe(viewLifecycleOwner, Observer {
 //            logger.d("initialLoadState = $it")
 //            instaAdapter.registerAdapterDataObserver(RecyclerView.AdapterDataObserver() {
 //
@@ -120,16 +119,21 @@ class InstaFragment : Fragment() {
         logger.d("loadImageView")
         val selected = instaAdapter.getPickleMedia(position)
         selected?.getUri()?.let {
-            when (preViewModel.scaleType.value) {
-                GlideScaleType.CENTER_CROP -> Glide.with(iv_preview).load(it).centerCrop().into(
-                    iv_preview
-                )
-                GlideScaleType.CENTER_INSIDE -> Glide.with(iv_preview).load(it).centerInside().into(
-                    iv_preview
-                )
-                else -> {
-                }
-            }
+            iv_preview.setUri(it)
+//            iv_preview.setImageFilePath(it.toString())
         }
+//        selected?.getUri()?.let {
+//
+//            when (preViewModel.scaleType.value) {
+//                GlideScaleType.CENTER_CROP -> Glide.with(iv_preview).load(it).centerCrop().into(
+//                    iv_preview
+//                )
+//                GlideScaleType.CENTER_INSIDE -> Glide.with(iv_preview).load(it).centerInside().into(
+//                    iv_preview
+//                )
+//                else -> {
+//                }
+//            }
+//        }
     }
 }

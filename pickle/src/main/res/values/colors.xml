@@ -25,4 +25,6 @@
     <color name="GR400A">#00E676</color>
     <color name="GR700A">#00C853</color>
 
+    <color name="light_white">#80ffffff</color>
+
 </resources>

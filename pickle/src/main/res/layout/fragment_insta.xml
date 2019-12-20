@@ -38,27 +38,19 @@
                     android:layout_height="wrap_content"
                     >
 
-                    <ImageView
+                    <life.sabujak.pickle.ui.insta.CropLayout
                         android:id="@+id/iv_preview"
                         android:layout_width="match_parent"
                         android:layout_height="0dp"
-                        app:layout_constraintDimensionRatio="W,1:1"
-                        app:layout_constraintTop_toTopOf="parent" />
-<!--                    <com.naver.android.helloyako.imagecrop.view.ImageCropView xmlns:imagecrop="http://schemas.android.com/apk/res-auto"-->
-<!--                        android:id="@+id/iv_preview"-->
-<!--                        android:layout_width="match_parent"-->
-<!--                        android:layout_height="0dp"-->
-<!--                        android:visibility="visible"-->
-<!--                        app:layout_constraintDimensionRatio="W,1:1"-->
-<!--                        app:layout_constraintTop_toTopOf="parent"-->
-<!--                        imagecrop:gridInnerColor="#66ffffff"-->
-<!--                        imagecrop:gridInnerStroke="1dp"-->
-<!--                        imagecrop:gridOuterColor="#ffffff"-->
-<!--                        imagecrop:gridOuterStroke="1dp"-->
-<!--                        imagecrop:outsideLayerColor="#99000000"-->
-<!--                        imagecrop:setInnerGridMode="on"-->
-<!--                        imagecrop:setOuterGridMode="on" />-->
-
+                        app:cropme_background_alpha="80%"
+                        app:cropme_frame_height_percent="100%"
+                        app:cropme_frame_width_percent="100%"
+                        app:cropme_max_scale="5.0"
+                        app:cropme_overlay_shape="rectangle"
+                        app:cropme_with_border="true"
+                        app:layout_constraintDimensionRatio="h,1:1"
+                        app:layout_constraintTop_toTopOf="parent"
+                        />
                     <ImageView
                         android:id="@+id/iv_ratio"
                         android:layout_width="36dp"
