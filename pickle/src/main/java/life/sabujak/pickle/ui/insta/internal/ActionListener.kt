@@ -38,4 +38,6 @@ internal interface ActionListener {
    * Called when moving action ends
    */
   fun onMoveEnded()
+
+  fun cancel()
 }

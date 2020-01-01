@@ -8,8 +8,8 @@ import android.graphics.drawable.BitmapDrawable
 import android.net.Uri
 import android.os.Handler
 import android.util.AttributeSet
-import android.util.Log
 import android.view.Gravity
+import android.view.View
 import android.view.ViewGroup.LayoutParams.MATCH_PARENT
 import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
 import android.view.ViewTreeObserver
@@ -19,6 +19,7 @@ import androidx.annotation.MainThread
 import life.sabujak.pickle.R
 import life.sabujak.pickle.ui.insta.internal.GestureAnimation
 import life.sabujak.pickle.ui.insta.internal.GestureAnimator
+import life.sabujak.pickle.util.Logger
 import java.util.concurrent.CopyOnWriteArrayList
 import kotlin.concurrent.thread
 
@@ -33,187 +34,205 @@ class CropLayout @JvmOverloads constructor(
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0
 ) : FrameLayout(context, attrs, defStyleAttr) {
+    val logger = Logger.getLogger(this::class.java.simpleName)
+    private lateinit var frame: RectF
+    private var scale = DEFAULT_MAX_SCALE
+    private var percentWidth = DEFAULT_PERCENT_WIDTH
+    private var percentHeight = DEFAULT_PERCENT_HEIGHT
 
-  private val cropImageView: CropImageView by lazy {
-    CropImageView(context, null, 0)
-  }
-  private val cropOverlay: RectangleCropOverlay by lazy {
-    RectangleCropOverlay(context, null, 0, attrs)
-  }
-  private var frameCache: RectF? = null
+    private lateinit var animator: GestureAnimator
+    private lateinit var animation: GestureAnimation
 
-  private val listeners = CopyOnWriteArrayList<OnCropListener>()
+    private var cropImageView: CropImageView
 
-  init {
-    val attr = context.obtainStyledAttributes(attrs, R.styleable.CropLayout, 0, 0)
+    private val cropOverlay: RectangleCropOverlay by lazy {
+        RectangleCropOverlay(context, null, 0, attrs)
+    }
+    private var frameCache: RectF? = null
+    private val listeners = CopyOnWriteArrayList<OnCropListener>()
 
-    val percentWidth: Float
-    val percentHeight: Float
-    val scale: Float
+    init {
+        val attr = context.obtainStyledAttributes(attrs, R.styleable.CropLayout, 0, 0)
+        cropImageView = CropImageView(context, null, 0)
+        cropOverlay.layoutParams = LayoutParams(MATCH_PARENT, MATCH_PARENT, Gravity.CENTER)
+        addView(cropImageView, 0)
+        addView(cropOverlay, 1)
 
-    try {
-      cropImageView.scaleType = ImageView.ScaleType.FIT_XY
-      cropImageView.adjustViewBounds = true
-      cropImageView.layoutParams = LayoutParams(WRAP_CONTENT, WRAP_CONTENT, Gravity.CENTER)
-      addView(cropImageView, 0)
+        try {
+            scale = attr.getFloat(R.styleable.CropLayout_max_scale, DEFAULT_MAX_SCALE)
 
-      cropOverlay.layoutParams = LayoutParams(MATCH_PARENT, MATCH_PARENT, Gravity.CENTER)
-      addView(cropOverlay, 1)
+            percentWidth = attr.getFraction(
+                R.styleable.CropLayout_frame_width_percent,
+                DEFAULT_BASE,
+                DEFAULT_PBASE,
+                DEFAULT_PERCENT_WIDTH
+            )
+            percentHeight = attr.getFraction(
+                R.styleable.CropLayout_frame_height_percent,
+                DEFAULT_BASE,
+                DEFAULT_PBASE,
+                DEFAULT_PERCENT_HEIGHT
+            )
+        } finally {
+            attr.recycle()
+        }
 
-      scale = attr.getFloat(R.styleable.CropLayout_cropme_max_scale, DEFAULT_MAX_SCALE)
+        val vto = viewTreeObserver
+        vto.addOnPreDrawListener(object : ViewTreeObserver.OnPreDrawListener {
+            override fun onPreDraw(): Boolean {
+                val totalWidth = measuredWidth.toFloat()
+                val totalHeight = measuredHeight.toFloat()
+                val frameWidth = measuredWidth * percentWidth
+                val frameHeight = measuredHeight * percentHeight
+                frame = RectF(
+                    (totalWidth - frameWidth) / 2f,
+                    (totalHeight - frameHeight) / 2f,
+                    (totalWidth + frameWidth) / 2f,
+                    (totalHeight + frameHeight) / 2f
+                )
+                cropImageView.setFrame(frame)
+                cropOverlay.setFrame(frame)
+                cropOverlay.requestLayout()
+                frameCache = frame
 
-      percentWidth = attr.getFraction(
-          R.styleable.CropLayout_cropme_frame_width_percent,
-          DEFAULT_BASE,
-          DEFAULT_PBASE,
-          DEFAULT_PERCENT_WIDTH
-      )
-      percentHeight = attr.getFraction(
-          R.styleable.CropLayout_cropme_frame_height_percent,
-          DEFAULT_BASE,
-          DEFAULT_PBASE,
-          DEFAULT_PERCENT_HEIGHT
-      )
-    } finally {
-      attr.recycle()
+                when {
+                    vto.isAlive -> vto.removeOnPreDrawListener(this)
+                    else -> cropOverlay.viewTreeObserver.removeOnPreDrawListener(this)
+                }
+                return true
+            }
+        })
     }
 
-    val vto = viewTreeObserver
-    vto.addOnPreDrawListener(object : ViewTreeObserver.OnPreDrawListener {
-
-      override fun onPreDraw(): Boolean {
-
-        val totalWidth = measuredWidth.toFloat()
-        val totalHeight = measuredHeight.toFloat()
-        val frameWidth = measuredWidth * percentWidth
-        val frameHeight = measuredHeight * percentHeight
-        val frame = RectF(
-            (totalWidth - frameWidth) / 2f,
-            (totalHeight - frameHeight) / 2f,
-            (totalWidth + frameWidth) / 2f,
-            (totalHeight + frameHeight) / 2f
-        )
-
-        cropImageView.setFrame(frame)
+    fun setUri(uri: Uri) {
+        cropImageView.setImageURI(uri)
         cropImageView.requestLayout()
-        cropOverlay.setFrame(frame)
-        cropOverlay.requestLayout()
-        frameCache = frame
+    }
 
-        val animator = GestureAnimator.of(cropImageView, frame, scale)
-        val animation = GestureAnimation(cropOverlay, animator)
+    fun setBitmap(bitmap: Bitmap) {
+        cropImageView.setImageBitmap(bitmap)
+        cropImageView.requestLayout()
+    }
+
+    fun addOnCropListener(listener: OnCropListener) {
+        listeners.addIfAbsent(listener)
+    }
+
+    fun removeOnCropListener(listener: OnCropListener) {
+        listeners.addIfAbsent(listener)
+    }
+
+    /**
+     * Check if image is off of the frame.
+     *
+     * You would need to call this to make sure if image is croppable.
+     * If the image is off of the frame, [crop] does nothing.
+     */
+    fun isOffFrame(): Boolean {
+        val frameRect = frameCache ?: return false
+        val targetRect = Rect()
+        cropImageView.getHitRect(targetRect)
+        return !targetRect.contains(
+            frameRect.left.toInt(),
+            frameRect.top.toInt(),
+            frameRect.right.toInt(),
+            frameRect.bottom.toInt()
+        )
+    }
+
+    /**
+     * Crop the image and returns the result via [OnCropListener].
+     *
+     * If cropping is successful [OnCropListener.onSuccess] would be called, otherwise [OnCropListener.onFailure].
+     * This [crop] only works when the image is fully on the frame, otherwise [crop] does nothing.
+     */
+    @MainThread
+    fun crop() {
+        if (isOffFrame()) {
+            logger.d("Image is off of the frame.")
+            return
+        }
+        val frame = frameCache ?: return
+        val mainHandler = Handler()
+        val targetRect = Rect().apply { cropImageView.getHitRect(this) }
+        val source = (cropImageView.drawable as BitmapDrawable).bitmap
+        thread {
+            val bitmap =
+                Bitmap.createScaledBitmap(source, targetRect.width(), targetRect.height(), false)
+            val leftOffset = (frame.left - targetRect.left).toInt()
+            val topOffset = (frame.top - targetRect.top).toInt()
+            val width = frame.width().toInt()
+            val height = frame.height().toInt()
+            try {
+                val result = Bitmap.createBitmap(bitmap, leftOffset, topOffset, width, height)
+                mainHandler.post {
+                    for (listener in listeners) {
+                        listener.onSuccess(result)
+                    }
+                }
+            } catch (e: Exception) {
+                for (listener in listeners) {
+                    listener.onFailure(e)
+                }
+            }
+        }
+    }
+
+    fun setCropScale(uri: Uri) {
+        cropOverlay.visibility = View.VISIBLE
+        cropImageView.top = top
+        cropImageView.left = left
+        cropImageView.x = 0f
+        cropImageView.y = 0f
+        cropImageView.scaleType = ImageView.ScaleType.FIT_XY
+        cropImageView.adjustViewBounds = true
+        cropImageView.setImageURI(uri)
+        cropImageView.layoutParams = LayoutParams(WRAP_CONTENT, WRAP_CONTENT, Gravity.CENTER)
+        cropImageView.requestLayout()
+        animator = GestureAnimator.of(cropImageView, frame, scale)
+        animation = GestureAnimation(cropOverlay, animator)
         animation.start()
-        when {
-          vto.isAlive -> vto.removeOnPreDrawListener(this)
-          else -> cropOverlay.viewTreeObserver.removeOnPreDrawListener(this)
-        }
-        return true
-      }
-    })
-  }
-
-  fun setUri(uri: Uri) {
-    cropImageView.setImageURI(uri)
-    cropImageView.requestLayout()
-  }
-
-  fun setBitmap(bitmap: Bitmap) {
-    cropImageView.setImageBitmap(bitmap)
-    cropImageView.requestLayout()
-  }
-
-  fun addOnCropListener(listener: OnCropListener) {
-    listeners.addIfAbsent(listener)
-  }
-
-  fun removeOnCropListener(listener: OnCropListener) {
-    listeners.addIfAbsent(listener)
-  }
-
-  /**
-   * Check if image is off of the frame.
-   *
-   * You would need to call this to make sure if image is croppable.
-   * If the image is off of the frame, [crop] does nothing.
-   */
-  fun isOffFrame(): Boolean {
-    val frameRect = frameCache ?: return false
-    val targetRect = Rect()
-    cropImageView.getHitRect(targetRect)
-    return !targetRect.contains(
-        frameRect.left.toInt(),
-        frameRect.top.toInt(),
-        frameRect.right.toInt(),
-        frameRect.bottom.toInt()
-    )
-  }
-
-  /**
-   * Crop the image and returns the result via [OnCropListener].
-   *
-   * If cropping is successful [OnCropListener.onSuccess] would be called, otherwise [OnCropListener.onFailure].
-   * This [crop] only works when the image is fully on the frame, otherwise [crop] does nothing.
-   */
-  @MainThread
-  fun crop() {
-    if (isOffFrame()) {
-      Log.w(TAG, "Image is off of the frame.")
-      return
+        val position = IntArray(2).apply { cropImageView.getLocationOnScreen(this) }
+        logger.d("setCropScale() : cropImageView" + "(" + position[0] + ", " + position[1] + ") " + cropImageView.width + ", " + cropImageView.height)
     }
-    val frame = frameCache ?: return
-    val mainHandler = Handler()
-    val targetRect = Rect().apply { cropImageView.getHitRect(this) }
-    val source = (cropImageView.drawable as BitmapDrawable).bitmap
-    thread {
-      val bitmap = Bitmap.createScaledBitmap(source, targetRect.width(), targetRect.height(), false)
-      val leftOffset = (frame.left - targetRect.left).toInt()
-      val topOffset = (frame.top - targetRect.top).toInt()
-      val width = frame.width().toInt()
-      val height = frame.height().toInt()
-      try {
-        val result = Bitmap.createBitmap(bitmap, leftOffset, topOffset, width, height)
-        mainHandler.post {
-          for (listener in listeners) {
-            listener.onSuccess(result)
-          }
-        }
-      } catch (e: Exception) {
-        for (listener in listeners) {
-          listener.onFailure(e)
-        }
-      }
+
+    fun setAspectRatio(uri: Uri) {
+        if (::animation.isInitialized) animation.stop()
+        cropOverlay.visibility = View.GONE
+        cropImageView.layoutParams = LayoutParams(MATCH_PARENT, MATCH_PARENT, Gravity.CENTER)
+        cropImageView.scaleType = ImageView.ScaleType.FIT_CENTER
+        cropImageView.setImageURI(uri)
+        cropImageView.top = top
+        cropImageView.left = left
+        cropImageView.right = right
+        cropImageView.bottom = bottom
+        cropImageView.x = 0f
+        cropImageView.y = 0f
+        cropImageView.maxWidth = width
+        cropImageView.maxHeight = height
+        cropImageView.scaleX = 1f
+        cropImageView.scaleY = 1f
+        cropImageView.requestLayout()
+//        val position = IntArray(2).apply { cropImageView.getLocationOnScreen(this) }
+//        logger.d("setAspectRatio() : cropImageView" + "(" + cropImageView.left +", " + cropImageView.top + ") " + cropImageView.width + ", " + cropImageView.height)
+//        logger.d("setAspectRatio() : cropImageView" + "(" + cropImageView.left +", " + cropImageView.x + ", " + cropImageView.top + ", " + cropImageView.y + ") "
+//                + cropImageView.width + ", " + cropImageView.height)
+//        logger.d("setAspectRatio() : cropImageView" + "(" + position[0] + ", " + position[1] + ") " + cropImageView.width + ", " + cropImageView.height)
     }
-  }
 
-  @MainThread
-  fun setAspectRatio(setAspect: Boolean){
-    if(setAspect){
-      removeViewAt(1)
-      val totalWidth = measuredWidth.toFloat()
-      val totalHeight = measuredHeight.toFloat()
-      val frame = RectF(
-        0f,
-        0f,
-        totalWidth,
-        totalHeight
-      )
-      cropImageView.setFrame(frame)
-      cropImageView.scaleType = ImageView.ScaleType.CENTER_INSIDE
-      cropImageView.requestLayout()
-
+    fun isEmpty(): Boolean {
+        cropImageView.drawable ?: return true
+        return false
     }
-  }
 
-  companion object {
 
-    private const val TAG = "CropLayout"
+    companion object {
+        private const val DEFAULT_MAX_SCALE = 2f
 
-    private const val DEFAULT_MAX_SCALE = 2f
+        private const val DEFAULT_BASE = 1
+        private const val DEFAULT_PBASE = 1
 
-    private const val DEFAULT_BASE = 1
-    private const val DEFAULT_PBASE = 1
-
-    private const val DEFAULT_PERCENT_WIDTH = 0.8f
-    private const val DEFAULT_PERCENT_HEIGHT = 0.8f
-  }
+        private const val DEFAULT_PERCENT_WIDTH = 0.8f
+        private const val DEFAULT_PERCENT_HEIGHT = 0.8f
+    }
 }

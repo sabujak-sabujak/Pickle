@@ -75,5 +75,6 @@ internal class GestureAnimation(
 
   fun stop() {
     trackPad.setOnTouchListener(null)
+    actionListener.cancel()
   }
 }

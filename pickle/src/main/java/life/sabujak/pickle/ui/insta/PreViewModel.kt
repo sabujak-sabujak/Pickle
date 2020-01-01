@@ -7,12 +7,11 @@ import androidx.lifecycle.ViewModel
 class PreViewModel : ViewModel() {
     // scaleType CENTER_CROP/CENTER_INSIDE, Crop output Uri, Multiselection Enable/disable, if Multiselection Uri list
 
-    private val _scaleType = MutableLiveData<GlideScaleType>().apply { postValue(GlideScaleType.CENTER_CROP) }
-    var scaleType: LiveData<GlideScaleType> = _scaleType
-
+    private val _isAspectRatio = MutableLiveData<Boolean>().apply { postValue(false)}
+    var isAspectRatio: LiveData<Boolean> = _isAspectRatio
 
     fun ratioClicked() {
-        if (_scaleType.value == GlideScaleType.CENTER_CROP) _scaleType.value = GlideScaleType.CENTER_INSIDE
-        else _scaleType.value = GlideScaleType.CENTER_CROP
+        if(_isAspectRatio.value == true) _isAspectRatio.postValue(false)
+        else _isAspectRatio.postValue(true)
     }
 }

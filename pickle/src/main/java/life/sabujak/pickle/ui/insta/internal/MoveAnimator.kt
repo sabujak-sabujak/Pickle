@@ -19,6 +19,8 @@ internal interface MoveAnimator {
    */
   fun adjust()
 
+  fun cancel()
+
   /**
    * fling image
    *

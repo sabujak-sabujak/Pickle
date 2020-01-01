@@ -36,7 +36,7 @@ class RectangleCropOverlay @JvmOverloads constructor(
       val a = context.obtainStyledAttributes(cropOverlayAttrs, R.styleable.CropOverlay, 0, 0)
       try {
         backgroundAlpha = a.getFraction(
-          R.styleable.CropLayout_cropme_background_alpha,
+          R.styleable.CropLayout_background_alpha,
           DEFAULT_BASE,
           DEFAULT_PBASE,
           DEFAULT_BACKGROUND_ALPHA

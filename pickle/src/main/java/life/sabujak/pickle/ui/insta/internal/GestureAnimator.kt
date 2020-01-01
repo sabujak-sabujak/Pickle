@@ -35,6 +35,11 @@ internal class GestureAnimator(
     verticalAnimator.adjust()
   }
 
+    override fun cancel() {
+        horizontalAnimator.cancel()
+        verticalAnimator.cancel()
+    }
+
   companion object {
 
     fun of(target: View, frame: RectF, scale: Float): GestureAnimator {

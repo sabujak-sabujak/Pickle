@@ -126,7 +126,7 @@ internal class HorizontalAnimatorImpl @VisibleForTesting constructor(
     }
   }
 
-  private fun cancel() {
+  override fun cancel() {
     animator.cancel()
     spring.cancel()
     fling.cancel()
