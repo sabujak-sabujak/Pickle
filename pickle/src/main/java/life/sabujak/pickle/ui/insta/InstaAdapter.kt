@@ -17,7 +17,7 @@ class InstaAdapter : PagedListAdapter<PickleMedia, BindingHolder>(diffCallback) 
     val logger = Logger.getLogger("InstaAdapter")
 
     interface ItemClick {
-        fun onClick(view: View, position: Int)
+        fun onClick(view: View?, position: Int)
     }
 
     private var selectedItem: SparseBooleanArray = SparseBooleanArray(0)

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+  <declare-styleable name="CropLayout">
+    <attr name="frame_width_percent" />
+    <attr name="frame_height_percent" />
+    <attr name="max_scale" />
+    <attr name="overlay_shape" />
+    <attr name="with_border" />
+    <attr name="background_alpha" />
+    <attr name="custom_shape_layout" />
+  </declare-styleable>
+
+  <declare-styleable name="CropOverlay">
+    <attr name="cropme_with_border" />
+    <attr name="cropme_background_alpha" />
+  </declare-styleable>
+</resources>
