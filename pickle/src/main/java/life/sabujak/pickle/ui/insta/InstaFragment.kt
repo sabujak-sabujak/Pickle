@@ -6,26 +6,27 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
+import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.GridLayoutManager
-import com.bumptech.glide.Glide
-import kotlinx.android.synthetic.main.fragment_insta.*
+import com.google.android.material.appbar.AppBarLayout
 import life.sabujak.pickle.R
 import life.sabujak.pickle.databinding.FragmentInstaBinding
 import life.sabujak.pickle.ui.common.PickleViewModel
 import life.sabujak.pickle.util.Logger
+import life.sabujak.pickle.util.Status
 
 class InstaFragment : Fragment() {
     val logger = Logger.getLogger("InstaFragment")
 
     lateinit var binding: FragmentInstaBinding
-    lateinit var viewModel: PickleViewModel
+    lateinit var pickleViewModel: PickleViewModel
     lateinit var preViewModel: PreViewModel
-    val instaAdapter = InstaAdapter()
-    val gridLayoutManager by lazy {
+    private val instaAdapter = InstaAdapter()
+    private val gridLayoutManager by lazy {
         GridLayoutManager(context, 3)
     }
     var selectedPosition: Int = -1
@@ -34,7 +35,7 @@ class InstaFragment : Fragment() {
         super.onAttach(context)
         activity?.let {
             (it as? AppCompatActivity)?.supportActionBar?.hide()
-            viewModel = ViewModelProviders.of(it).get(PickleViewModel::class.java)
+            pickleViewModel = ViewModelProviders.of(it).get(PickleViewModel::class.java)
             preViewModel = ViewModelProviders.of(it).get(PreViewModel::class.java)
         }
     }
@@ -42,14 +43,6 @@ class InstaFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         logger.d("onCreate")
-        viewModel.items.observe(this, Observer { pagedList ->
-            instaAdapter.submitList(pagedList)
-        })
-        preViewModel.scaleType.observe(this, Observer {
-            iv_preview.drawable?.let {
-                loadImageView(selectedPosition)
-            }
-        })
     }
 
     override fun onCreateView(
@@ -57,20 +50,33 @@ class InstaFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        logger.d("onCreateView")
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_insta, container, false)
         binding.apply {
             viewModel = preViewModel
             recyclerView.adapter = instaAdapter
             recyclerView.layoutManager = gridLayoutManager
-//            previewLayout.setOnScrollChangeListener{null}
+            val appBar = previewAppbarLayout
+            appBar.layoutParams?.let {
+                val behavior = AppBarLayout.Behavior()
+                behavior.setDragCallback(object : AppBarLayout.Behavior.DragCallback() {
+                    override fun canDrag(p0: AppBarLayout): Boolean {
+                        return false
+                    }
+                })
+                (it as CoordinatorLayout.LayoutParams).behavior = behavior
+            }
+            (activity as? AppCompatActivity)?.setSupportActionBar(binding.toolbar)
         }
 
         instaAdapter.itemClick = object : InstaAdapter.ItemClick {
-            override fun onClick(view: View, position: Int) {
+            override fun onClick(view: View?, position: Int) {
                 selectedPosition = position
                 loadImageView(position)
-                binding.recyclerView.smoothScrollBy(0, view.top)
-                binding.previewLayout.setExpanded(true)
+                view?.let {
+                    binding.recyclerView.smoothScrollBy(0, it.top)
+                    binding.previewAppbarLayout.setExpanded(true)
+                }
             }
         }
         return binding.root
@@ -78,16 +84,31 @@ class InstaFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        pickleViewModel.items.observe(viewLifecycleOwner, Observer { pagedList ->
+            instaAdapter.submitList(pagedList)
+        })
+        preViewModel.isAspectRatio.observe(viewLifecycleOwner, Observer {
+            if (!binding.ivPreview.isEmpty()) loadImageView(selectedPosition)
+        })
+        pickleViewModel.initialLoadState.observe(viewLifecycleOwner, Observer {
+            logger.d("initialLoadState = $it")
+            if(it.status == Status.SUCCESS){
+                logger.d("Item Count : " + instaAdapter.itemCount)
+//                instaAdapter.itemClick?.onClick(null, 0)
+            }
+        })
+        pickleViewModel.dataSourceState.observe(viewLifecycleOwner, Observer{
+            logger.d("dataSourceState = $it")
+        })
     }
 
+
     fun loadImageView(position: Int) {
+        logger.d("loadImageView")
         val selected = instaAdapter.getPickleMedia(position)
         selected?.getUri()?.let {
-            when (preViewModel.scaleType.value) {
-                GlideScaleType.CENTER_CROP -> Glide.with(iv_preview).load(it).centerCrop().into(iv_preview)
-                GlideScaleType.CENTER_INSIDE -> Glide.with(iv_preview).load(it).centerInside().into(iv_preview)
-                else -> {}
-            }
+            if (preViewModel.isAspectRatio.value == true) binding.ivPreview.setAspectRatio(it)
+            else binding.ivPreview.setCropScale(it)
         }
     }
 }
