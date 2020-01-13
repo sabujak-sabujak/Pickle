@@ -9,6 +9,12 @@ import life.sabujak.pickle.data.entity.PickleMedia
 @BindingAdapter("pickleMedia")
 fun setImage(view: ImageView, media: PickleMedia?) {
     media?.getUri()?.let {
-        Glide.with(view).load(it).into(view)
+        val rm = Glide.with(view)
+        if(Runtime.getRuntime().maxMemory()> 134217728){
+            rm.load(it).into(view)
+        }else{
+            rm.asBitmap().load(it).into(view)
+        }
+
     }
 }
