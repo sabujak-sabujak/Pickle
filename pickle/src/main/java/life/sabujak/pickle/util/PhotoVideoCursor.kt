@@ -12,10 +12,12 @@ class PhotoVideoCursor(context:Context):PickleCursor(context){
 
         val projection = arrayOf(
             MediaStore.Files.FileColumns._ID,
+            MediaStore.Files.FileColumns.BUCKET_ID,
             MediaStore.Files.FileColumns.DATA,
             MediaStore.Files.FileColumns.MEDIA_TYPE,
             MediaStore.Files.FileColumns.DATE_MODIFIED,
             MediaStore.Files.FileColumns.SIZE,
+            MediaStore.Files.FileColumns.MIME_TYPE,
             MediaStore.Video.VideoColumns.DURATION
         )
 
