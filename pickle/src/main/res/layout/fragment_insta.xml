@@ -5,7 +5,7 @@
     <data>
         <variable
             name="viewModel"
-            type="life.sabujak.pickle.ui.insta.PreViewModel" />
+            type="life.sabujak.pickle.ui.insta.InstaViewModel" />
     </data>
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:app="http://schemas.android.com/apk/res-auto"

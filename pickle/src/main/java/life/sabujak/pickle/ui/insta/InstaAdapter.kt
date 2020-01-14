@@ -1,29 +1,20 @@
 package life.sabujak.pickle.ui.insta
 
-import android.util.SparseBooleanArray
-import android.view.View
 import android.view.ViewGroup
+import androidx.lifecycle.Lifecycle
+import androidx.paging.PagedList
 import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
-import kotlinx.android.synthetic.main.view_insta_media.view.*
 import life.sabujak.pickle.BR
 import life.sabujak.pickle.R
 import life.sabujak.pickle.data.entity.PickleMedia
 import life.sabujak.pickle.ui.common.BindingHolder
+import life.sabujak.pickle.ui.common.adapter.PickleBindingComponent
 import life.sabujak.pickle.util.Logger
 
-class InstaAdapter : PagedListAdapter<PickleMedia, BindingHolder>(diffCallback) {
+class InstaAdapter(val lifecycle: Lifecycle, val selectionManager:InstaSelectionManager, val onEventListener: OnInstaEventListener ) : PagedListAdapter<PickleMedia, BindingHolder>(diffCallback) {
 
-    val logger = Logger.getLogger("InstaAdapter")
-
-    interface ItemClick {
-        fun onClick(view: View?, position: Int)
-    }
-
-    private var selectedItem: SparseBooleanArray = SparseBooleanArray(0)
-
-    var itemClick: ItemClick? = null
-    var lastClickedPosition: Int = -1
+    val logger = Logger.getLogger(this.javaClass.simpleName)
 
     companion object {
         val diffCallback = object : DiffUtil.ItemCallback<PickleMedia>() {
@@ -37,41 +28,39 @@ class InstaAdapter : PagedListAdapter<PickleMedia, BindingHolder>(diffCallback) 
         }
     }
 
+    init {
+        setHasStableIds(true)
+    }
+
+    override fun getItemId(position: Int): Long {
+        return getItem(position)?.getId()?: run {
+            logger.i("getItemId : item not found")
+            position.toLong()
+        }
+    }
+
     override fun getItemViewType(position: Int): Int {
         return R.layout.view_insta_media
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BindingHolder {
-        return BindingHolder(parent, viewType)
+        return BindingHolder(parent, viewType, PickleBindingComponent(lifecycle))
     }
 
     override fun onBindViewHolder(holder: BindingHolder, position: Int) {
         val item = getItem(position)
         item?.let {
-            holder.binding.setVariable(BR.item,item)
-            holder.itemView.v_cover.visibility = if(isItemSelected(position)) { View.VISIBLE} else {View.INVISIBLE}
-            holder.itemView.setOnClickListener{v->
-                logger.d("item Clicked ")
-                holder.itemView.v_cover.visibility = View.VISIBLE
-                toggleItemSelected(lastClickedPosition)
-                toggleItemSelected(position)
-                lastClickedPosition = position
-                itemClick?.onClick(v, position)
-            }
+            holder.binding.setVariable(BR.item, it)
+            holder.binding.setVariable(BR.instaSelectionManager, selectionManager)
+            holder.binding.setVariable(BR.onEventListener, onEventListener)
             holder.binding.executePendingBindings()
         }
     }
 
-    private fun isItemSelected(position: Int): Boolean{
-        return selectedItem.get(position, false)
-    }
-
-    private fun toggleItemSelected(position: Int){
-        if(selectedItem.get(position, false)) selectedItem.delete(position) else selectedItem.put(position, true)
-        notifyDataSetChanged()
-    }
-
-    fun getPickleMedia(position: Int): PickleMedia?{
-        return getItem(position)
+    override fun submitList(pagedList: PagedList<PickleMedia>?) {
+        super.submitList(pagedList)
+        if(pagedList?.size != 0) {
+            onEventListener.onItemClick(null, pagedList?.get(0)!!)
+        }
     }
 }

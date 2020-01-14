@@ -5,15 +5,24 @@
     >
 
     <data>
+
+        <import type="android.view.View" />
         <variable
             name="item"
             type="life.sabujak.pickle.data.entity.PickleMedia" />
+        <variable
+            name="instaSelectionManager"
+            type="life.sabujak.pickle.ui.insta.InstaSelectionManager" />
+        <variable
+            name="onEventListener"
+            type="life.sabujak.pickle.ui.insta.OnInstaEventListener" />
 
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        app:onClick="@{v->onEventListener.onItemClick(v, item)}"
         android:orientation="vertical">
         <ImageView
             android:id="@+id/iv_media_item"
@@ -33,8 +42,7 @@
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:background="#90FFFFFF"
-            android:visibility="invisible"
-            app:layout_constraintDimensionRatio="1:1"
+            android:visibility="@{instaSelectionManager.isChecked(item.id) ? View.VISIBLE : View.GONE}"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"

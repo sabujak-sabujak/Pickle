@@ -48,7 +48,7 @@ class PickleDataSource(val context: Context) : PositionalDataSource<PickleMedia>
     }
 
     override fun loadRange(params: LoadRangeParams, callback: LoadRangeCallback<PickleMedia>) {
-        logger.d("loadRange : startPostion = ${params.startPosition} loadSize = ${params.loadSize}")
+        logger.d("loadRange : startPosition = ${params.startPosition} loadSize = ${params.loadSize}")
         dataSourceState.postValue(DataSourceState.LOADING)
         callback.onResult(getMediaList(cursor, params.loadSize))
         dataSourceState.postValue(DataSourceState.LOADED)

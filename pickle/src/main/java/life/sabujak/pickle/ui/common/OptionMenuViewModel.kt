@@ -69,4 +69,8 @@ class OptionMenuViewModel(val app: Application) : AndroidViewModel(app),
     }
 
     override fun getLifecycle(): Lifecycle = lifecycleRegistry
+
+    fun setCountable(isCountable: Boolean){
+        isCountVisible.value = isCountable
+    }
 }
