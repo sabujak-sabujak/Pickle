@@ -41,6 +41,7 @@ class PickleDataSource(val context: Context) : PositionalDataSource<PickleMedia>
             }
             val list = getMediaList(it, params.requestedLoadSize)
             callback.onResult(list, 0, it.count)
+            logger.i("list.size = "+list.size)
             initialLoad.postValue(DataSourceState.LOADED)
         }?: kotlin.run {
             initialLoad.postValue(DataSourceState.error("Cursor is null"))
@@ -74,12 +75,16 @@ class PickleDataSource(val context: Context) : PositionalDataSource<PickleMedia>
     @SuppressLint("InlinedApi")
     private fun makePickleMedia(cursor: Cursor): PickleMedia {
         val id = cursor.getLong(cursor.getColumnIndex(MediaStore.Files.FileColumns._ID))
+        val bucketId = cursor.getString(cursor.getColumnIndex("bucket_id"))
         val contentUri = ContentUris.withAppendedId(uri, id)
         val data = cursor.getString(cursor.getColumnIndex(MediaStore.Files.FileColumns.DATA))
         val mediaType = cursor.getInt(cursor.getColumnIndex(MediaStore.Files.FileColumns.MEDIA_TYPE))
         val isVideo = MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO==mediaType
         val dateModified = cursor.getLong(cursor.getColumnIndex(MediaStore.Video.Media.DATE_MODIFIED))
         val fileSize = cursor.getInt(cursor.getColumnIndex(MediaStore.Files.FileColumns.SIZE))
+        val mimeType = cursor.getString(cursor.getColumnIndex(MediaStore.Files.FileColumns.MIME_TYPE))
+
+        logger.d("id = $id bucketId = $bucketId contentUri = $contentUri data = $data mediaType = $mediaType isVideo = $isVideo dateModified = $dateModified fileSize = $fileSize mimeType = $mimeType")
         return if(isVideo){
             val duration = cursor.getLong(cursor.getColumnIndex(MediaStore.Video.VideoColumns.DURATION))
             Video(id,contentUri, data, dateModified, fileSize,duration)
