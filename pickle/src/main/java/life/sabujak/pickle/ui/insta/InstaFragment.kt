@@ -1,10 +1,14 @@
 package life.sabujak.pickle.ui.insta
 
 import android.content.Context
+import android.graphics.Bitmap
+import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.databinding.DataBindingUtil
@@ -14,29 +18,33 @@ import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.GridLayoutManager
 import com.google.android.material.appbar.AppBarLayout
 import life.sabujak.pickle.R
+import life.sabujak.pickle.data.entity.PickleMedia
 import life.sabujak.pickle.databinding.FragmentInstaBinding
-import life.sabujak.pickle.ui.common.PickleViewModel
+import life.sabujak.pickle.ui.common.OptionMenuViewModel
 import life.sabujak.pickle.util.Logger
-import life.sabujak.pickle.util.Status
 
-class InstaFragment : Fragment() {
-    val logger = Logger.getLogger("InstaFragment")
+class InstaFragment : Fragment(), OnInstaEventListener {
+    val logger = Logger.getLogger(this.javaClass.simpleName)
 
     lateinit var binding: FragmentInstaBinding
-    lateinit var pickleViewModel: PickleViewModel
-    lateinit var preViewModel: PreViewModel
-    private val instaAdapter = InstaAdapter()
+    lateinit var instaViewModel: InstaViewModel
+    lateinit var optionMenuViewModel: OptionMenuViewModel
+    private val instaAdapter by lazy {
+        InstaAdapter(lifecycle, instaViewModel.selectionManager, this)
+    }
     private val gridLayoutManager by lazy {
         GridLayoutManager(context, 3)
     }
-    var selectedPosition: Int = -1
+
+    var selectedUri: Uri? = null
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
         activity?.let {
             (it as? AppCompatActivity)?.supportActionBar?.hide()
-            pickleViewModel = ViewModelProviders.of(it).get(PickleViewModel::class.java)
-            preViewModel = ViewModelProviders.of(it).get(PreViewModel::class.java)
+            instaViewModel = ViewModelProviders.of(it).get(InstaViewModel::class.java)
+            optionMenuViewModel = ViewModelProviders.of(it).get(OptionMenuViewModel::class.java)
+            optionMenuViewModel.setCountable(false)
         }
     }
 
@@ -53,8 +61,9 @@ class InstaFragment : Fragment() {
         logger.d("onCreateView")
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_insta, container, false)
         binding.apply {
-            viewModel = preViewModel
+            viewModel = instaViewModel
             recyclerView.adapter = instaAdapter
+            lifecycleOwner = viewLifecycleOwner
             recyclerView.layoutManager = gridLayoutManager
             val appBar = previewAppbarLayout
             appBar.layoutParams?.let {
@@ -67,48 +76,70 @@ class InstaFragment : Fragment() {
                 (it as CoordinatorLayout.LayoutParams).behavior = behavior
             }
             (activity as? AppCompatActivity)?.setSupportActionBar(binding.toolbar)
+            ivPreview.addOnCropListener(object : OnCropListener {
+                override fun onSuccess(bitmap: Bitmap) {
+                    val view = layoutInflater.inflate(R.layout.dialog_result, null)
+                    view.findViewById<ImageView>(R.id.iv_image).setImageBitmap(bitmap)
+                    AlertDialog.Builder(ivPreview.context).setView(view).show()
+                }
+
+                override fun onFailure(e: Exception) {
+                    logger.e("Failed to crop image.")
+                }
+            })
         }
 
-        instaAdapter.itemClick = object : InstaAdapter.ItemClick {
-            override fun onClick(view: View?, position: Int) {
-                selectedPosition = position
-                loadImageView(position)
-                view?.let {
-                    binding.recyclerView.smoothScrollBy(0, it.top)
-                    binding.previewAppbarLayout.setExpanded(true)
-                }
-            }
-        }
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        pickleViewModel.items.observe(viewLifecycleOwner, Observer { pagedList ->
+        instaViewModel.items.observe(viewLifecycleOwner, Observer { pagedList ->
+            logger.d("submitList to Adapter")
             instaAdapter.submitList(pagedList)
         })
-        preViewModel.isAspectRatio.observe(viewLifecycleOwner, Observer {
-            if (!binding.ivPreview.isEmpty()) loadImageView(selectedPosition)
+        instaViewModel.isAspectRatio.observe(viewLifecycleOwner, Observer {
+            if (!binding.ivPreview.isEmpty()) loadUri(selectedUri)
         })
-        pickleViewModel.initialLoadState.observe(viewLifecycleOwner, Observer {
+        instaViewModel.initialLoadState.observe(viewLifecycleOwner, Observer {
             logger.d("initialLoadState = $it")
-            if(it.status == Status.SUCCESS){
-                logger.d("Item Count : " + instaAdapter.itemCount)
-//                instaAdapter.itemClick?.onClick(null, 0)
-            }
         })
-        pickleViewModel.dataSourceState.observe(viewLifecycleOwner, Observer{
+        instaViewModel.dataSourceState.observe(viewLifecycleOwner, Observer {
             logger.d("dataSourceState = $it")
+        })
+
+        optionMenuViewModel.clickEvent.observe(viewLifecycleOwner, Observer {
+            activity?.let {
+                if (!binding.ivPreview.isOffFrame() && instaViewModel.isAspectRatio.value == false) {
+                    binding.ivPreview.crop()
+                } else if (instaViewModel.isAspectRatio.value == true) {
+                    val dialogContentView = layoutInflater.inflate(R.layout.dialog_result, null)
+                    dialogContentView.findViewById<ImageView>(R.id.iv_image)
+                        .setImageURI(selectedUri)
+                    AlertDialog.Builder(it).setView(dialogContentView).show()
+                }
+            }
         })
     }
 
-
-    fun loadImageView(position: Int) {
-        logger.d("loadImageView")
-        val selected = instaAdapter.getPickleMedia(position)
-        selected?.getUri()?.let {
-            if (preViewModel.isAspectRatio.value == true) binding.ivPreview.setAspectRatio(it)
+    private fun loadUri(uri: Uri?){
+        uri?.let{
+            if (instaViewModel.isAspectRatio.value == true) binding.ivPreview.setAspectRatio(it)
             else binding.ivPreview.setCropScale(it)
         }
+    }
+
+    override fun onItemClick(view: View?, pickleMedia: PickleMedia) {
+        pickleMedia.getUri()?.let{
+            selectedUri = it
+            if (instaViewModel.isAspectRatio.value == true) binding.ivPreview.setAspectRatio(it)
+            else binding.ivPreview.setCropScale(it)
+        }
+
+        view?.let{
+            binding.recyclerView.smoothScrollBy(0, it.top)
+            binding.previewAppbarLayout.setExpanded(true)
+        }
+        instaViewModel.selectionManager.toggleItemSelected(pickleMedia.getId())
     }
 }
