@@ -12,6 +12,7 @@ class InstaViewModel(application: Application) : AndroidViewModel(application) {
 
     private val _isAspectRatio = MutableLiveData<Boolean>().apply { postValue(false) }
     var isAspectRatio: LiveData<Boolean> = _isAspectRatio
+    lateinit var selectedPickleMedia: PickleMedia
 
     val selectionManager = InstaSelectionManager()
 
@@ -42,5 +43,9 @@ class InstaViewModel(application: Application) : AndroidViewModel(application) {
     fun ratioClicked() {
         if (_isAspectRatio.value == true) _isAspectRatio.postValue(false)
         else _isAspectRatio.postValue(true)
+    }
+
+    fun setSelected(selected: PickleMedia){
+        selectedPickleMedia = selected
     }
 }

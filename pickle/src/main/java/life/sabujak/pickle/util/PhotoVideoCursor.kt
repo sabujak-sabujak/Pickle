@@ -18,7 +18,8 @@ class PhotoVideoCursor(context:Context):PickleCursor(context){
             MediaStore.Files.FileColumns.DATE_MODIFIED,
             MediaStore.Files.FileColumns.SIZE,
             MediaStore.Files.FileColumns.MIME_TYPE,
-            MediaStore.Video.VideoColumns.DURATION
+            MediaStore.Video.VideoColumns.DURATION,
+            MediaStore.MediaColumns.ORIENTATION
         )
 
         val selection = "" +
