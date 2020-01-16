@@ -17,6 +17,8 @@ import android.widget.FrameLayout
 import android.widget.ImageView
 import androidx.annotation.MainThread
 import life.sabujak.pickle.R
+import life.sabujak.pickle.data.entity.Image
+import life.sabujak.pickle.data.entity.PickleMedia
 import life.sabujak.pickle.ui.insta.internal.GestureAnimation
 import life.sabujak.pickle.ui.insta.internal.GestureAnimator
 import life.sabujak.pickle.util.Logger
@@ -44,6 +46,7 @@ class CropLayout @JvmOverloads constructor(
     private lateinit var animation: GestureAnimation
 
     private var cropImageView: CropImageView
+    private lateinit var pickleMedia: PickleMedia
 
     private val cropOverlay: RectangleCropOverlay by lazy {
         RectangleCropOverlay(context, null, 0, attrs)
@@ -55,6 +58,7 @@ class CropLayout @JvmOverloads constructor(
         val attr = context.obtainStyledAttributes(attrs, R.styleable.CropLayout, 0, 0)
         cropImageView = CropImageView(context, null, 0)
         cropOverlay.layoutParams = LayoutParams(MATCH_PARENT, MATCH_PARENT, Gravity.CENTER)
+        cropOverlay.visibility = View.GONE
         addView(cropImageView, 0)
         addView(cropOverlay, 1)
 
@@ -94,6 +98,7 @@ class CropLayout @JvmOverloads constructor(
                 cropOverlay.setFrame(frame)
                 cropOverlay.requestLayout()
                 frameCache = frame
+                setCropScale()
 
                 when {
                     vto.isAlive -> vto.removeOnPreDrawListener(this)
@@ -178,7 +183,7 @@ class CropLayout @JvmOverloads constructor(
         }
     }
 
-    fun setCropScale(uri: Uri, orientation: Float) {
+    fun setCropScale() {
         cropOverlay.visibility = View.VISIBLE
         cropImageView.top = top
         cropImageView.left = left
@@ -186,9 +191,7 @@ class CropLayout @JvmOverloads constructor(
         cropImageView.y = 0f
         cropImageView.scaleType = ImageView.ScaleType.FIT_XY
         cropImageView.adjustViewBounds = true
-        cropImageView.setImageURI(uri)
         cropImageView.layoutParams = LayoutParams(WRAP_CONTENT, WRAP_CONTENT, Gravity.CENTER)
-        cropImageView.rotation = orientation
         cropImageView.requestLayout()
         animator = GestureAnimator.of(cropImageView, frame, scale)
         animation = GestureAnimation(cropOverlay, animator)
@@ -197,12 +200,11 @@ class CropLayout @JvmOverloads constructor(
         logger.d("setCropScale() : cropImageView" + "(" + position[0] + ", " + position[1] + ") " + cropImageView.width + ", " + cropImageView.height)
     }
 
-    fun setAspectRatio(uri: Uri, orientation: Float) {
+    fun setAspectRatio() {
         if (::animation.isInitialized) animation.stop()
         cropOverlay.visibility = View.GONE
         cropImageView.layoutParams = LayoutParams(MATCH_PARENT, MATCH_PARENT, Gravity.CENTER)
         cropImageView.scaleType = ImageView.ScaleType.FIT_CENTER
-        cropImageView.setImageURI(uri)
         cropImageView.top = top
         cropImageView.left = left
         cropImageView.right = right
@@ -213,13 +215,18 @@ class CropLayout @JvmOverloads constructor(
         cropImageView.maxHeight = height
         cropImageView.scaleX = 1f
         cropImageView.scaleY = 1f
-        cropImageView.rotation = orientation
         cropImageView.requestLayout()
     }
 
     fun isEmpty(): Boolean {
         cropImageView.drawable ?: return true
         return false
+    }
+
+    fun setPickleMedia(pickle: PickleMedia){
+        pickleMedia = pickle
+        cropImageView.setImageURI(pickleMedia.getUri())
+        cropImageView.rotation = (pickleMedia as Image).orientation
     }
 
     companion object {
