@@ -119,7 +119,7 @@ class CropLayout @JvmOverloads constructor(
     }
 
     fun removeOnCropListener(listener: OnCropListener) {
-        listeners.addIfAbsent(listener)
+        listeners.remove(listener)
     }
 
     /**
@@ -178,7 +178,7 @@ class CropLayout @JvmOverloads constructor(
         }
     }
 
-    fun setCropScale(uri: Uri) {
+    fun setCropScale(uri: Uri, orientation: Float) {
         cropOverlay.visibility = View.VISIBLE
         cropImageView.top = top
         cropImageView.left = left
@@ -188,6 +188,7 @@ class CropLayout @JvmOverloads constructor(
         cropImageView.adjustViewBounds = true
         cropImageView.setImageURI(uri)
         cropImageView.layoutParams = LayoutParams(WRAP_CONTENT, WRAP_CONTENT, Gravity.CENTER)
+        cropImageView.rotation = orientation
         cropImageView.requestLayout()
         animator = GestureAnimator.of(cropImageView, frame, scale)
         animation = GestureAnimation(cropOverlay, animator)
@@ -196,7 +197,7 @@ class CropLayout @JvmOverloads constructor(
         logger.d("setCropScale() : cropImageView" + "(" + position[0] + ", " + position[1] + ") " + cropImageView.width + ", " + cropImageView.height)
     }
 
-    fun setAspectRatio(uri: Uri) {
+    fun setAspectRatio(uri: Uri, orientation: Float) {
         if (::animation.isInitialized) animation.stop()
         cropOverlay.visibility = View.GONE
         cropImageView.layoutParams = LayoutParams(MATCH_PARENT, MATCH_PARENT, Gravity.CENTER)
@@ -212,6 +213,7 @@ class CropLayout @JvmOverloads constructor(
         cropImageView.maxHeight = height
         cropImageView.scaleX = 1f
         cropImageView.scaleY = 1f
+        cropImageView.rotation = orientation
         cropImageView.requestLayout()
     }
 
@@ -219,7 +221,6 @@ class CropLayout @JvmOverloads constructor(
         cropImageView.drawable ?: return true
         return false
     }
-
 
     companion object {
         private const val DEFAULT_MAX_SCALE = 2f
