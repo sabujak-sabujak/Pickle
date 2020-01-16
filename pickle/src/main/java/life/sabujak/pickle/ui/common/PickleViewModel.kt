@@ -14,7 +14,7 @@ class PickleViewModel(application: Application) : AndroidViewModel(application){
 
     private val logger = Logger.getLogger(PickleViewModel::class.java.simpleName)
 
-    val selectionManager = SelectionManager()
+    val selectionManager = SelectionManager(application)
 
     private val dataSourceFactory by lazy {
         PickleDataSourceFactory(application)
