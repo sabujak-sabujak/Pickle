@@ -22,6 +22,7 @@ import life.sabujak.pickle.data.entity.PickleMedia
 import life.sabujak.pickle.databinding.FragmentInstaBinding
 import life.sabujak.pickle.ui.common.OptionMenuViewModel
 import life.sabujak.pickle.util.Logger
+import life.sabujak.pickle.util.ext.showToast
 
 class InstaFragment : Fragment(), OnInstaEventListener {
     val logger = Logger.getLogger(this.javaClass.simpleName)
@@ -114,16 +115,21 @@ class InstaFragment : Fragment(), OnInstaEventListener {
 
         optionMenuViewModel.clickEvent.observe(viewLifecycleOwner, Observer {
             activity?.let {
-                if (!binding.ivPreview.isOffFrame() && instaViewModel.isAspectRatio.value == false) {
-                    binding.ivPreview.crop()
-                } else if (instaViewModel.isAspectRatio.value == true) {
-                    val dialogLayout = layoutInflater.inflate(R.layout.dialog_result, null)
-                    val dialogImageView = dialogLayout.findViewById<ImageView>(R.id.iv_image)
-                    dialogImageView.setImageURI(instaViewModel.selectedPickleMedia.getUri())
-                    dialogImageView.rotation =
-                        (instaViewModel.selectedPickleMedia as Image).orientation
-                    dialogImageView.scaleType = ImageView.ScaleType.FIT_CENTER
-                    AlertDialog.Builder(it).setView(dialogLayout).show()
+                if(instaViewModel.selectedPickleMedia.getType() != PickleMedia.Type.PHOTO){
+                    showToast("video is not supported now")
+                }
+                else {
+                    if (!binding.ivPreview.isOffFrame() && instaViewModel.isAspectRatio.value == false) {
+                        binding.ivPreview.crop()
+                    } else if (instaViewModel.isAspectRatio.value == true) {
+                        val dialogLayout = layoutInflater.inflate(R.layout.dialog_result, null)
+                        val dialogImageView = dialogLayout.findViewById<ImageView>(R.id.iv_image)
+                        dialogImageView.setImageURI(instaViewModel.selectedPickleMedia.getUri())
+                        dialogImageView.rotation =
+                            (instaViewModel.selectedPickleMedia as Image).orientation
+                        dialogImageView.scaleType = ImageView.ScaleType.FIT_CENTER
+                        AlertDialog.Builder(it).setView(dialogLayout).show()
+                    }
                 }
             }
         })
@@ -138,11 +144,16 @@ class InstaFragment : Fragment(), OnInstaEventListener {
 
     override fun onItemClick(view: View?, pickleMedia: PickleMedia) {
         instaViewModel.setSelected(pickleMedia)
+        instaViewModel.selectionManager.toggleItemSelected(pickleMedia.getId())
+        if(instaViewModel.selectedPickleMedia.getType() != PickleMedia.Type.PHOTO){
+            showToast("video is not supported now")
+            binding.ivPreview.clear()
+            return
+        }
         loadPickleMedia(pickleMedia)
         view?.let {
             binding.recyclerView.smoothScrollBy(0, it.top)
             binding.previewAppbarLayout.setExpanded(true)
         }
-        instaViewModel.selectionManager.toggleItemSelected(pickleMedia.getId())
     }
 }

@@ -229,6 +229,10 @@ class CropLayout @JvmOverloads constructor(
         cropImageView.rotation = (pickleMedia as Image).orientation
     }
 
+    fun clear(){
+        cropImageView.setImageResource(0)
+    }
+
     companion object {
         private const val DEFAULT_MAX_SCALE = 2f
 
