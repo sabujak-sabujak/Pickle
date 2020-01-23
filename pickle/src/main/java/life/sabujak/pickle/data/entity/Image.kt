@@ -7,8 +7,7 @@ data class Image(
     private val uri: Uri?,
     private val data: String?,
     val dateModified: Long,
-    val fileSize: Int,
-    val orientation: Float) :PickleMedia {
+    val fileSize: Int) :PickleMedia {
     override fun getUri() =uri
 
     override fun getData()=data

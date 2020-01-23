@@ -33,7 +33,7 @@ class InstaAdapter(val lifecycle: Lifecycle, val selectionManager:InstaSelection
     }
 
     override fun getItemId(position: Int): Long {
-        return getItem(position)?.getId()?: run {
+        return getItem(position)?.getId() ?: run {
             logger.i("getItemId : item not found")
             position.toLong()
         }
@@ -54,13 +54,6 @@ class InstaAdapter(val lifecycle: Lifecycle, val selectionManager:InstaSelection
             holder.binding.setVariable(BR.instaSelectionManager, selectionManager)
             holder.binding.setVariable(BR.onEventListener, onEventListener)
             holder.binding.executePendingBindings()
-        }
-    }
-
-    override fun submitList(pagedList: PagedList<PickleMedia>?) {
-        super.submitList(pagedList)
-        if(pagedList?.size != 0) {
-            onEventListener.onItemClick(null, pagedList?.get(0)!!)
         }
     }
 }
