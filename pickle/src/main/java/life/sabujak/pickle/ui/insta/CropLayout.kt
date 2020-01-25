@@ -31,7 +31,7 @@ import kotlin.concurrent.thread
 /**
  * Layout to show Image and Frame.
  *
- * This will be the parent view that holds [CropImageView] and [CropOverlay].
+ * This will be the parent view that holds [CropImageView]
  * This is based on https://github.com/TakuSemba/CropMe
  */
 class CropLayout @JvmOverloads constructor(
@@ -188,6 +188,12 @@ class CropLayout @JvmOverloads constructor(
 
     fun setCropScale() {
         cropOverlay.visibility = View.VISIBLE
+        cropImageView.scaleX = 1f
+        cropImageView.scaleY = 1f
+        cropImageView.top = top
+        cropImageView.left = left
+        cropImageView.x = 0f
+        cropImageView.y = 0f
         cropImageView.scaleType = ImageView.ScaleType.CENTER_CROP
         cropImageView.adjustViewBounds = true
         cropImageView.layoutParams = LayoutParams(WRAP_CONTENT, WRAP_CONTENT, Gravity.CENTER)
@@ -195,6 +201,10 @@ class CropLayout @JvmOverloads constructor(
         animator = GestureAnimator.of(cropImageView, frame, scale)
         animation = GestureAnimation(cropOverlay, animator)
         animation.start()
+//        val position = IntArray(2).apply { cropImageView.getLocationOnScreen(this) }
+//        logger.d("setCropScale() : cropImageView ${cropImageView.left}, ${cropImageView.top}, ${cropImageView.right}, ${cropImageView.bottom}, ${cropImageView.x}, ${cropImageView.y}" +
+//                " scaleX : ${cropImageView.scaleX} ")
+//        logger.d("setCropScale() : cropImageView realposition ${position[0]}, ${position[1]}")
     }
 
     fun setAspectRatio() {
@@ -213,11 +223,15 @@ class CropLayout @JvmOverloads constructor(
         cropImageView.scaleX = 1f
         cropImageView.scaleY = 1f
         cropImageView.requestLayout()
+//        val position = IntArray(2).apply { cropImageView.getLocationOnScreen(this) }
+//        logger.d("setAspectRatio() : cropImageView ${cropImageView.left}, ${cropImageView.top}, ${cropImageView.right}, ${cropImageView.bottom}, ${cropImageView.x}, ${cropImageView.y}" +
+//                " scaleX : ${cropImageView.scaleX} ")
+//        logger.d("setAspectRatio() : cropImageView realposition ${position[0]}, ${position[1]}")
     }
 
     fun isEmpty(): Boolean {
-        cropImageView.drawable ?: return true
-        return false
+        pickleMedia?.let{ return false}
+        return true
     }
 
     fun setPickleMedia(pickle: PickleMedia) {
