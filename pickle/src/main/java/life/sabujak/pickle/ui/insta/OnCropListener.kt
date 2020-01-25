@@ -11,10 +11,10 @@ interface OnCropListener {
   /**
    * called when cropping is successful
    *
-   * @param bitmap result drawable
+   * @param bitmap result
    */
-  fun onSuccess(d: Drawable)
-//  fun onSuccess(bitmap: Bitmap)
+//  fun onSuccess(d: Drawable)
+  fun onSuccess(bitmap: Bitmap)
 
   /**
    * called when cropping is failed

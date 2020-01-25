@@ -33,7 +33,7 @@ internal interface MoveAnimator {
     /**
      * stiffness when flinging or bouncing
      */
-    const val STIFFNESS = SpringForce.STIFFNESS_VERY_LOW
+    const val STIFFNESS = SpringForce.STIFFNESS_MEDIUM
 
     /**
      * dumping ratio when flinging or bouncing

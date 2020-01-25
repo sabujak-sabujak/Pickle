@@ -1,7 +1,7 @@
 package life.sabujak.pickle.ui.insta
 
 import android.content.Context
-import android.graphics.drawable.Drawable
+import android.graphics.Bitmap
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -76,8 +76,7 @@ class InstaFragment : Fragment(), OnInstaEventListener {
             }
             (activity as? AppCompatActivity)?.setSupportActionBar(binding.toolbar)
             ivPreview.addOnCropListener(object : OnCropListener {
-                override fun onSuccess(result: Drawable) {
-//                override fun onSuccess(bitmap: Bitmap) {
+                override fun onSuccess(result: Bitmap) {
                     val dialogLayout = layoutInflater.inflate(R.layout.dialog_result, null)
                     var dialogImageView = dialogLayout.findViewById<ImageView>(R.id.iv_image)
                     context?.let {
@@ -86,8 +85,6 @@ class InstaFragment : Fragment(), OnInstaEventListener {
                         val alertDialog = AlertDialog.Builder(it)
                         alertDialog.setOnDismissListener {
                             logger.d("release bitmap")
-//                        bitmap.recycle()
-//                        dialogImageView.setImageBitmap(null)
                             dialogImageView.setImageDrawable(null)
                             dialogImageView = null
                         }
@@ -96,7 +93,7 @@ class InstaFragment : Fragment(), OnInstaEventListener {
                 }
 
                 override fun onFailure(e: Exception) {
-                    logger.e("Failed to crop image.")
+                    logger.e("Failed to crop image. msg : ${e.message}" )
                 }
             })
         }
@@ -150,6 +147,9 @@ class InstaFragment : Fragment(), OnInstaEventListener {
     private fun loadPickleMedia(pickleMedia: PickleMedia) {
         if (pickleMedia.getType() == PickleMedia.Type.PHOTO) {
             binding.ivPreview.setPickleMedia(pickleMedia)
+            if (!binding.ivPreview.isEmpty()) {
+                if (instaViewModel.isAspectRatio.value == true) binding.ivPreview.setAspectRatio() else binding.ivPreview.setCropScale()
+            }
         }
 //        TODO("VIDEO 에 대한 처리")
     }

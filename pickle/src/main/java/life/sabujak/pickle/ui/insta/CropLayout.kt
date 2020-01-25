@@ -153,29 +153,25 @@ class CropLayout @JvmOverloads constructor(
         val frame = frameCache ?: return
         val targetRect = Rect().apply { cropImageView.getHitRect(this) }
         val source = (cropImageView.drawable as BitmapDrawable).bitmap
-        logger.d("cropImageView ${cropImageView.left}, ${cropImageView.top} frame ${frame.left}, ${frame.top} targetRect ${targetRect.left}, ${targetRect.top}")
+
         thread {
-            val bitmap =
-                Bitmap.createScaledBitmap(source, targetRect.width(), targetRect.height(), false)
             val leftOffset = (frame.left - targetRect.left).toInt()
             val topOffset = (frame.top - targetRect.top).toInt()
             val width = frame.width().toInt()
             val height = frame.height().toInt()
             val cropData =
-                CropData(leftOffset, topOffset, width, height, source.width, source.height)
+                CropData(leftOffset, topOffset, width, height, targetRect.width(), targetRect.height())
+            logger.d("cropData : ${leftOffset}, ${topOffset}, ${width}, ${height}, ${source.width}, ${source.height}")
 
             try {
-                logger.d("result ${leftOffset}, ${topOffset}")
-
-                Glide.with(context).asBitmap().load(bitmap)
+                Glide.with(context).asBitmap().load(source)
                     .transform(CropTransformation(cropData)).into(object : CustomTarget<Bitmap>() {
                         override fun onResourceReady(
                             result: Bitmap,
                             transition: Transition<in Bitmap>?
                         ) {
-                            val d = BitmapDrawable(resources, result)
                             for (listener in listeners) {
-                                listener.onSuccess(d)
+                                listener.onSuccess(result)
                             }
                         }
 
@@ -192,10 +188,6 @@ class CropLayout @JvmOverloads constructor(
 
     fun setCropScale() {
         cropOverlay.visibility = View.VISIBLE
-        cropImageView.top = top
-        cropImageView.left = left
-        cropImageView.x = 0f
-        cropImageView.y = 0f
         cropImageView.scaleType = ImageView.ScaleType.CENTER_CROP
         cropImageView.adjustViewBounds = true
         cropImageView.layoutParams = LayoutParams(WRAP_CONTENT, WRAP_CONTENT, Gravity.CENTER)
@@ -203,8 +195,6 @@ class CropLayout @JvmOverloads constructor(
         animator = GestureAnimator.of(cropImageView, frame, scale)
         animation = GestureAnimation(cropOverlay, animator)
         animation.start()
-        val position = IntArray(2).apply { cropImageView.getLocationOnScreen(this) }
-        logger.d("setCropScale() : cropImageView" + "(" + position[0] + ", " + position[1] + ") " + cropImageView.width + ", " + cropImageView.height)
     }
 
     fun setAspectRatio() {

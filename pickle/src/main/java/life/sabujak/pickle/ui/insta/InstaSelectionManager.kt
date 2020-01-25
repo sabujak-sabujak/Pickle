@@ -10,7 +10,6 @@ class InstaSelectionManager : BaseObservable() {
     var lastselected: Long = -1
 
     fun isChecked(id:Long):Boolean{
-        logger.d("isChecked ${id}")
         return lastselected == id
     }
 
