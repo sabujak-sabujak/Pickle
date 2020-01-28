@@ -15,20 +15,21 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.GridLayoutManager
+import com.bumptech.glide.Glide
 import com.google.android.material.appbar.AppBarLayout
 import life.sabujak.pickle.R
-import life.sabujak.pickle.data.entity.Image
 import life.sabujak.pickle.data.entity.PickleMedia
 import life.sabujak.pickle.databinding.FragmentInstaBinding
 import life.sabujak.pickle.ui.common.OptionMenuViewModel
 import life.sabujak.pickle.util.Logger
+import life.sabujak.pickle.util.ext.showToast
 
 class InstaFragment : Fragment(), OnInstaEventListener {
     val logger = Logger.getLogger(this.javaClass.simpleName)
 
     lateinit var binding: FragmentInstaBinding
-    lateinit var instaViewModel: InstaViewModel
-    lateinit var optionMenuViewModel: OptionMenuViewModel
+    private lateinit var instaViewModel: InstaViewModel
+    private lateinit var optionMenuViewModel: OptionMenuViewModel
     private val instaAdapter by lazy {
         InstaAdapter(lifecycle, instaViewModel.selectionManager, this)
     }
@@ -75,17 +76,24 @@ class InstaFragment : Fragment(), OnInstaEventListener {
             }
             (activity as? AppCompatActivity)?.setSupportActionBar(binding.toolbar)
             ivPreview.addOnCropListener(object : OnCropListener {
-                override fun onSuccess(bitmap: Bitmap) {
+                override fun onSuccess(result: Bitmap) {
                     val dialogLayout = layoutInflater.inflate(R.layout.dialog_result, null)
-                    val dialogImageView = dialogLayout.findViewById<ImageView>(R.id.iv_image)
-                    dialogImageView.setImageBitmap(bitmap)
-                    dialogImageView.rotation = (instaViewModel.selectedPickleMedia as Image).orientation
-                    dialogImageView.scaleType = ImageView.ScaleType.FIT_CENTER
-                    AlertDialog.Builder(ivPreview.context).setView(dialogLayout).show()
+                    var dialogImageView = dialogLayout.findViewById<ImageView>(R.id.iv_image)
+                    context?.let {
+                        Glide.with(dialogLayout.context).load(result).fitCenter()
+                            .into(dialogImageView)
+                        val alertDialog = AlertDialog.Builder(it)
+                        alertDialog.setOnDismissListener {
+                            logger.d("release bitmap")
+                            dialogImageView.setImageDrawable(null)
+                            dialogImageView = null
+                        }
+                        alertDialog.setView(dialogLayout).show()
+                    }
                 }
 
                 override fun onFailure(e: Exception) {
-                    logger.e("Failed to crop image.")
+                    logger.e("Failed to crop image. msg : ${e.message}" )
                 }
             })
         }
@@ -97,10 +105,18 @@ class InstaFragment : Fragment(), OnInstaEventListener {
         super.onViewCreated(view, savedInstanceState)
         instaViewModel.items.observe(viewLifecycleOwner, Observer { pagedList ->
             logger.d("submitList to Adapter")
-            instaAdapter.submitList(pagedList)
+            instaAdapter.submitList(pagedList, object : Runnable {
+                override fun run() {
+                    pagedList?.let {
+                        if (it.size != 0) onItemClick(null, it.get(0)!!)
+                    }
+                }
+            })
         })
         instaViewModel.isAspectRatio.observe(viewLifecycleOwner, Observer {
-            if (!binding.ivPreview.isEmpty()) loadPickleMedia(instaViewModel.selectedPickleMedia)
+            if (!binding.ivPreview.isEmpty()) {
+                if (it) binding.ivPreview.setAspectRatio() else binding.ivPreview.setCropScale()
+            }
         })
         instaViewModel.initialLoadState.observe(viewLifecycleOwner, Observer {
             logger.d("initialLoadState = $it")
@@ -111,15 +127,18 @@ class InstaFragment : Fragment(), OnInstaEventListener {
 
         optionMenuViewModel.clickEvent.observe(viewLifecycleOwner, Observer {
             activity?.let {
-                if (!binding.ivPreview.isOffFrame() && instaViewModel.isAspectRatio.value == false) {
-                    binding.ivPreview.crop()
-                } else if (instaViewModel.isAspectRatio.value == true) {
-                    val dialogLayout = layoutInflater.inflate(R.layout.dialog_result, null)
-                    val dialogImageView = dialogLayout.findViewById<ImageView>(R.id.iv_image)
-                    dialogImageView.setImageURI(instaViewModel.selectedPickleMedia.getUri())
-                    dialogImageView.rotation = (instaViewModel.selectedPickleMedia as Image).orientation
-                    dialogImageView.scaleType = ImageView.ScaleType.FIT_CENTER
-                    AlertDialog.Builder(it).setView(dialogLayout).show()
+                if (instaViewModel.selectedPickleMedia.getType() != PickleMedia.Type.PHOTO) {
+                    showToast("video is not supported now")
+                } else if (binding.ivPreview.isOffFrame()) showToast("Image is off of the frame.")
+                else {
+                    if (instaViewModel.isAspectRatio.value == false) binding.ivPreview.crop()
+                    else {
+                        val dialogLayout = layoutInflater.inflate(R.layout.dialog_result, null)
+                        val dialogImageView = dialogLayout.findViewById<ImageView>(R.id.iv_image)
+                        Glide.with(it).load(instaViewModel.selectedPickleMedia.getUri()).fitCenter()
+                            .into(dialogImageView)
+                        AlertDialog.Builder(it).setView(dialogLayout).show()
+                    }
                 }
             }
         })
@@ -127,25 +146,26 @@ class InstaFragment : Fragment(), OnInstaEventListener {
 
     private fun loadPickleMedia(pickleMedia: PickleMedia) {
         if (pickleMedia.getType() == PickleMedia.Type.PHOTO) {
-            val orientation = (pickleMedia as Image).orientation
-            pickleMedia.getUri()?.let {
-                if (instaViewModel.isAspectRatio.value == true) binding.ivPreview.setAspectRatio(
-                    it,
-                    orientation
-                )
-                else binding.ivPreview.setCropScale(it, orientation)
+            binding.ivPreview.setPickleMedia(pickleMedia)
+            if (!binding.ivPreview.isEmpty()) {
+                if (instaViewModel.isAspectRatio.value == true) binding.ivPreview.setAspectRatio() else binding.ivPreview.setCropScale()
             }
         }
-        // TODO : VIDEO 에 대한 처리
+//        TODO("VIDEO 에 대한 처리")
     }
 
     override fun onItemClick(view: View?, pickleMedia: PickleMedia) {
         instaViewModel.setSelected(pickleMedia)
+        instaViewModel.selectionManager.toggleItemSelected(pickleMedia.getId())
+        if (instaViewModel.selectedPickleMedia.getType() != PickleMedia.Type.PHOTO) {
+            showToast("video is not supported now")
+            binding.ivPreview.clear()
+            return
+        }
         loadPickleMedia(pickleMedia)
         view?.let {
             binding.recyclerView.smoothScrollBy(0, it.top)
             binding.previewAppbarLayout.setExpanded(true)
         }
-        instaViewModel.selectionManager.toggleItemSelected(pickleMedia.getId())
     }
 }
