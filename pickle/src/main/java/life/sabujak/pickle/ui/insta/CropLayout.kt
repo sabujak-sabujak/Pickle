@@ -240,7 +240,7 @@ class CropLayout @JvmOverloads constructor(
     }
 
     fun clear() {
-        cropImageView.setImageResource(0)
+        cropImageView.setImageResource(android.R.color.transparent)
     }
 
     companion object {
