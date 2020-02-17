@@ -56,6 +56,8 @@ class CropLayout @JvmOverloads constructor(
     private var frameCache: RectF? = null
     private val listeners = CopyOnWriteArrayList<OnCropListener>()
 
+    private var cropLogListener: CropDataListener? = null
+
     init {
         val attr = context.obtainStyledAttributes(attrs, R.styleable.CropLayout, 0, 0)
         cropImageView = CropImageView(context, null, 0)
@@ -117,6 +119,10 @@ class CropLayout @JvmOverloads constructor(
 
     fun removeOnCropListener(listener: OnCropListener) {
         listeners.remove(listener)
+    }
+
+    fun setOnCropLogListener(listener: CropDataListener){
+        cropLogListener = listener
     }
 
     /**
@@ -209,7 +215,7 @@ class CropLayout @JvmOverloads constructor(
         cropImageView.layoutParams = LayoutParams(WRAP_CONTENT, WRAP_CONTENT, Gravity.CENTER)
         cropImageView.requestLayout()
         animator = GestureAnimator.of(cropImageView, frame, scale)
-        animation = GestureAnimation(cropOverlay, animator)
+        animation = GestureAnimation(cropOverlay, animator, cropLogListener)
         animation.start()
 //        val position = IntArray(2).apply { cropImageView.getLocationOnScreen(this) }
 //        logger.d("setCropScale() : cropImageView ${cropImageView.left}, ${cropImageView.top}, ${cropImageView.right}, ${cropImageView.bottom}, ${cropImageView.x}, ${cropImageView.y}" +
@@ -252,7 +258,6 @@ class CropLayout @JvmOverloads constructor(
     fun clear() {
         cropImageView.setImageResource(android.R.color.transparent)
     }
-
 
     companion object {
         private const val DEFAULT_MAX_SCALE = 2f

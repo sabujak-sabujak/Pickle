@@ -58,6 +58,12 @@ class InstaSelectionManager : BaseObservable() {
         notifyChange()
     }
 
+    fun updateCropData(id: Long, cropData: CropData?){
+        cropData?.let{
+            selectionList.put(id, cropData)
+        }
+    }
+
     private fun updateCount() {
         this.count.value = selectionList.size
     }

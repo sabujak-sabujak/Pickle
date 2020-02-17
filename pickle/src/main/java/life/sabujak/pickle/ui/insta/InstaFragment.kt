@@ -21,6 +21,7 @@ import life.sabujak.pickle.R
 import life.sabujak.pickle.data.entity.PickleMedia
 import life.sabujak.pickle.databinding.FragmentInstaBinding
 import life.sabujak.pickle.ui.common.OptionMenuViewModel
+import life.sabujak.pickle.ui.insta.internal.CropDataListener
 import life.sabujak.pickle.util.Logger
 import life.sabujak.pickle.util.ext.showToast
 
@@ -75,6 +76,14 @@ class InstaFragment : Fragment(), OnInstaEventListener {
                 (it as CoordinatorLayout.LayoutParams).behavior = behavior
             }
             (activity as? AppCompatActivity)?.setSupportActionBar(binding.toolbar)
+            ivPreview.setOnCropLogListener(object : CropDataListener {
+                override fun onActionUp() {
+                    val cropData = ivPreview.getCropData()
+                    val selectedMedia = instaViewModel.selectedPickleMedia
+                    logger.d("onActionUp() ${cropData}")
+                    instaViewModel.selectionManager.updateCropData(selectedMedia.getId(), cropData)
+                }
+            })
             ivPreview.addOnCropListener(object : OnCropListener {
                 override fun onSuccess(bitmap: Bitmap) {
                     val dialogLayout = layoutInflater.inflate(R.layout.dialog_result, null)
@@ -164,7 +173,10 @@ class InstaFragment : Fragment(), OnInstaEventListener {
 
     override fun onItemClick(view: View?, pickleMedia: PickleMedia) {
         instaViewModel.setSelected(pickleMedia)
-        instaViewModel.selectionManager.itemClick(pickleMedia.getId(), binding.ivPreview.getCropData())
+        instaViewModel.selectionManager.itemClick(
+            pickleMedia.getId(),
+            binding.ivPreview.getCropData()
+        )
         if (instaViewModel.selectedPickleMedia.getType() != PickleMedia.Type.PHOTO) {
             showToast("video is not supported now")
             binding.ivPreview.clear()
