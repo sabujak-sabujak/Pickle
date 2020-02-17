@@ -20,8 +20,7 @@ import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
 import life.sabujak.pickle.R
 import life.sabujak.pickle.data.entity.PickleMedia
-import life.sabujak.pickle.ui.insta.internal.CropData
-import life.sabujak.pickle.ui.insta.internal.CropTransformation
+import life.sabujak.pickle.ui.insta.internal.*
 import life.sabujak.pickle.ui.insta.internal.GestureAnimation
 import life.sabujak.pickle.ui.insta.internal.GestureAnimator
 import life.sabujak.pickle.util.Logger
@@ -144,46 +143,57 @@ class CropLayout @JvmOverloads constructor(
      * If cropping is successful [OnCropListener.onSuccess] would be called, otherwise [OnCropListener.onFailure].
      * This [crop] only works when the image is fully on the frame, otherwise [crop] does nothing.
      */
-    @MainThread
     fun crop() {
         if (isOffFrame()) {
             logger.d("Image is off of the frame.")
             return
         }
-        val frame = frameCache ?: return
-        val targetRect = Rect().apply { cropImageView.getHitRect(this) }
         val source = (cropImageView.drawable as BitmapDrawable).bitmap
-
-        thread {
-            val leftOffset = (frame.left - targetRect.left).toInt()
-            val topOffset = (frame.top - targetRect.top).toInt()
-            val width = frame.width().toInt()
-            val height = frame.height().toInt()
-            val cropData =
-                CropData(leftOffset, topOffset, width, height, targetRect.width(), targetRect.height())
-            logger.d("cropData : ${leftOffset}, ${topOffset}, ${width}, ${height}, ${source.width}, ${source.height}")
-
-            try {
-                Glide.with(context).asBitmap().load(source)
-                    .transform(CropTransformation(cropData)).into(object : CustomTarget<Bitmap>() {
-                        override fun onResourceReady(
-                            result: Bitmap,
-                            transition: Transition<in Bitmap>?
-                        ) {
-                            for (listener in listeners) {
-                                listener.onSuccess(result)
+        frameCache?.let{
+            getCropData()?.let{
+                try{
+                    Glide.with(context).asBitmap().load(source)
+                        .transform(CropTransformation(it)).into(object : CustomTarget<Bitmap>() {
+                            override fun onResourceReady(
+                                result: Bitmap,
+                                transition: Transition<in Bitmap>?
+                            ) {
+                                for (listener in listeners) {
+                                    listener.onSuccess(result)
+                                }
                             }
-                        }
 
-                        override fun onLoadCleared(placeholder: Drawable?) {
-                        }
-                    })
-            } catch (e: Exception) {
-                for (listener in listeners) {
-                    listener.onFailure(e)
+                            override fun onLoadCleared(placeholder: Drawable?) {
+                            }
+                        })
+                } catch (e: Exception) {
+                    for (listener in listeners) {
+                        listener.onFailure(e)
+                    }
                 }
+
             }
+
         }
+    }
+
+    fun getCropData(): CropData? {
+        val targetRect = Rect().apply { cropImageView.getHitRect(this) }
+        frameCache?.let {
+            val leftOffset = (it.left - targetRect.left).toInt()
+            val topOffset = (it.top - targetRect.top).toInt()
+            val width = it.width().toInt()
+            val height = it.height().toInt()
+            return CropData(
+                leftOffset,
+                topOffset,
+                width,
+                height,
+                targetRect.width(),
+                targetRect.height()
+            )
+        }
+        return null
     }
 
     fun setCropScale() {
@@ -230,7 +240,7 @@ class CropLayout @JvmOverloads constructor(
     }
 
     fun isEmpty(): Boolean {
-        pickleMedia?.let{ return false}
+        pickleMedia?.let { return false }
         return true
     }
 
@@ -242,6 +252,7 @@ class CropLayout @JvmOverloads constructor(
     fun clear() {
         cropImageView.setImageResource(android.R.color.transparent)
     }
+
 
     companion object {
         private const val DEFAULT_MAX_SCALE = 2f

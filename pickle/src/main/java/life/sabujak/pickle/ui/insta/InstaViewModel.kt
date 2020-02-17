@@ -6,12 +6,15 @@ import androidx.paging.LivePagedListBuilder
 import androidx.paging.PagedList
 import life.sabujak.pickle.data.PickleDataSourceFactory
 import life.sabujak.pickle.data.entity.PickleMedia
+import life.sabujak.pickle.util.InitMutableLiveData
 
 class InstaViewModel(application: Application) : AndroidViewModel(application) {
     // scaleType CENTER_CROP/CENTER_INSIDE, Crop output Uri, Multiselection Enable/disable, if Multiselection Uri list
 
-    private val _isAspectRatio = MutableLiveData<Boolean>().apply { postValue(false) }
+    private val _isAspectRatio = InitMutableLiveData(false)
     var isAspectRatio: LiveData<Boolean> = _isAspectRatio
+    private val _isMultipleSelect = InitMutableLiveData(false)
+    var isMultipleSelect: LiveData<Boolean> = _isMultipleSelect
     lateinit var selectedPickleMedia: PickleMedia
 
     val selectionManager = InstaSelectionManager()
@@ -47,5 +50,20 @@ class InstaViewModel(application: Application) : AndroidViewModel(application) {
 
     fun setSelected(selected: PickleMedia){
         selectedPickleMedia = selected
+    }
+
+    fun multipleClicked() {
+        if(_isMultipleSelect.value == true) {
+            _isMultipleSelect.postValue(false)
+            selectionManager.setMultipleSelect(false)
+        }
+        else {
+            _isMultipleSelect.postValue(true)
+            selectionManager.setMultipleSelect(true)
+        }
+    }
+
+    fun isMultipleSelected(): Boolean?{
+        return isMultipleSelect.value
     }
 }

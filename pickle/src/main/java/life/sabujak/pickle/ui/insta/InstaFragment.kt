@@ -76,11 +76,11 @@ class InstaFragment : Fragment(), OnInstaEventListener {
             }
             (activity as? AppCompatActivity)?.setSupportActionBar(binding.toolbar)
             ivPreview.addOnCropListener(object : OnCropListener {
-                override fun onSuccess(result: Bitmap) {
+                override fun onSuccess(bitmap: Bitmap) {
                     val dialogLayout = layoutInflater.inflate(R.layout.dialog_result, null)
                     var dialogImageView = dialogLayout.findViewById<ImageView>(R.id.iv_image)
                     context?.let {
-                        Glide.with(dialogLayout.context).load(result).fitCenter()
+                        Glide.with(dialogLayout.context).load(bitmap).fitCenter()
                             .into(dialogImageView)
                         val alertDialog = AlertDialog.Builder(it)
                         alertDialog.setOnDismissListener {
@@ -93,7 +93,7 @@ class InstaFragment : Fragment(), OnInstaEventListener {
                 }
 
                 override fun onFailure(e: Exception) {
-                    logger.e("Failed to crop image. msg : ${e.message}" )
+                    logger.e("Failed to crop image. msg : ${e.message}")
                 }
             })
         }
@@ -116,6 +116,14 @@ class InstaFragment : Fragment(), OnInstaEventListener {
         instaViewModel.isAspectRatio.observe(viewLifecycleOwner, Observer {
             if (!binding.ivPreview.isEmpty()) {
                 if (it) binding.ivPreview.setAspectRatio() else binding.ivPreview.setCropScale()
+            }
+        })
+        instaViewModel.isMultipleSelect.observe(viewLifecycleOwner, Observer {
+            instaViewModel.selectionManager.clear()
+            if (it && !binding.ivPreview.isEmpty()) {
+                binding.ivPreview.getCropData()?.let {
+                    instaViewModel.selectionManager.setMultiCropData(cropData = it)
+                }
             }
         })
         instaViewModel.initialLoadState.observe(viewLifecycleOwner, Observer {
@@ -156,7 +164,7 @@ class InstaFragment : Fragment(), OnInstaEventListener {
 
     override fun onItemClick(view: View?, pickleMedia: PickleMedia) {
         instaViewModel.setSelected(pickleMedia)
-        instaViewModel.selectionManager.toggleItemSelected(pickleMedia.getId())
+        instaViewModel.selectionManager.itemClick(pickleMedia.getId(), binding.ivPreview.getCropData())
         if (instaViewModel.selectedPickleMedia.getType() != PickleMedia.Type.PHOTO) {
             showToast("video is not supported now")
             binding.ivPreview.clear()
