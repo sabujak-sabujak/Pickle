@@ -10,7 +10,6 @@ import androidx.lifecycle.*
 import life.sabujak.pickle.R
 import life.sabujak.pickle.databinding.ViewTextOptionsMenuBinding
 import life.sabujak.pickle.ui.common.adapter.PickleBindingComponent
-import life.sabujak.pickle.util.InitMutableLiveData
 import life.sabujak.pickle.util.SingleLiveEvent
 
 class OptionMenuViewModel(val app: Application) : AndroidViewModel(app),
@@ -22,10 +21,10 @@ class OptionMenuViewModel(val app: Application) : AndroidViewModel(app),
         handleLifecycleEvent(Lifecycle.Event.ON_CREATE)
     }
 
-    val title = InitMutableLiveData(app.getString(R.string.select))
-    val isEnabled = InitMutableLiveData(true)
-    val count = InitMutableLiveData(0)
-    val isCountVisible = InitMutableLiveData(true)
+    val title = MutableLiveData(app.getString(R.string.select))
+    val isEnabled = MutableLiveData(true)
+    val count = MutableLiveData(0)
+    val isCountVisible = MutableLiveData(true)
     val textColor = Transformations.map(isEnabled) {
         if (it) {
             ContextCompat.getColor(app, R.color.TC02)
@@ -58,7 +57,7 @@ class OptionMenuViewModel(val app: Application) : AndroidViewModel(app),
     }
 
     fun onClick() {
-        if (isEnabled.value) {
+        if (isEnabled.value!!) {
             clickEvent.call()
         }
     }

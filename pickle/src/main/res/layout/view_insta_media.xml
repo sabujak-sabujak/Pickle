@@ -9,7 +9,7 @@
         <import type="android.view.View" />
         <variable
             name="item"
-            type="life.sabujak.pickle.data.entity.PickleMedia" />
+            type="life.sabujak.pickle.data.entity.PickleItem" />
         <variable
             name="instaSelectionManager"
             type="life.sabujak.pickle.ui.insta.InstaSelectionManager" />

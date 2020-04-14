@@ -19,7 +19,8 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
 import life.sabujak.pickle.R
-import life.sabujak.pickle.data.entity.PickleMedia
+import life.sabujak.pickle.data.entity.Media
+import life.sabujak.pickle.data.entity.PickleItem
 import life.sabujak.pickle.ui.insta.internal.CropData
 import life.sabujak.pickle.ui.insta.internal.CropTransformation
 import life.sabujak.pickle.ui.insta.internal.GestureAnimation
@@ -49,7 +50,7 @@ class CropLayout @JvmOverloads constructor(
     private lateinit var animation: GestureAnimation
 
     private var cropImageView: CropImageView
-    private var pickleMedia: PickleMedia? = null
+    private var item: PickleItem? = null
 
     private val cropOverlay: RectangleCropOverlay by lazy {
         RectangleCropOverlay(context, null, 0, attrs)
@@ -230,13 +231,13 @@ class CropLayout @JvmOverloads constructor(
     }
 
     fun isEmpty(): Boolean {
-        pickleMedia?.let{ return false}
+        this.item?.let{ return false}
         return true
     }
 
-    fun setPickleMedia(pickle: PickleMedia) {
-        pickleMedia = pickle
-        Glide.with(this.context).load(pickleMedia?.getUri()).into(cropImageView)
+    fun setPickleMedia(item: PickleItem) {
+        this.item = item
+        Glide.with(this.context).load(this.item?.uri).into(cropImageView)
     }
 
     fun clear() {

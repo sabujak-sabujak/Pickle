@@ -3,6 +3,8 @@ package life.sabujak.pickle.ui.insta
 import android.content.Context
 import android.graphics.Bitmap
 import android.os.Bundle
+import android.provider.MediaStore
+import android.provider.MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -18,7 +20,8 @@ import androidx.recyclerview.widget.GridLayoutManager
 import com.bumptech.glide.Glide
 import com.google.android.material.appbar.AppBarLayout
 import life.sabujak.pickle.R
-import life.sabujak.pickle.data.entity.PickleMedia
+import life.sabujak.pickle.data.entity.Media
+import life.sabujak.pickle.data.entity.PickleItem
 import life.sabujak.pickle.databinding.FragmentInstaBinding
 import life.sabujak.pickle.ui.common.OptionMenuViewModel
 import life.sabujak.pickle.util.Logger
@@ -74,7 +77,7 @@ class InstaFragment : Fragment(), OnInstaEventListener {
                 })
                 (it as CoordinatorLayout.LayoutParams).behavior = behavior
             }
-            (activity as? AppCompatActivity)?.setSupportActionBar(binding.toolbar)
+//            (activity as? AppCompatActivity)?.setSupportActionBar(binding.toolbar)
             ivPreview.addOnCropListener(object : OnCropListener {
                 override fun onSuccess(result: Bitmap) {
                     val dialogLayout = layoutInflater.inflate(R.layout.dialog_result, null)
@@ -105,11 +108,9 @@ class InstaFragment : Fragment(), OnInstaEventListener {
         super.onViewCreated(view, savedInstanceState)
         instaViewModel.items.observe(viewLifecycleOwner, Observer { pagedList ->
             logger.d("submitList to Adapter")
-            instaAdapter.submitList(pagedList, object : Runnable {
-                override fun run() {
-                    pagedList?.let {
-                        if (it.size != 0) onItemClick(null, it.get(0)!!)
-                    }
+            instaAdapter.submitList(pagedList, Runnable {
+                pagedList?.let {
+                    if (it.size != 0) onItemClick(null, it.get(0)!!)
                 }
             })
         })
@@ -127,7 +128,7 @@ class InstaFragment : Fragment(), OnInstaEventListener {
 
         optionMenuViewModel.clickEvent.observe(viewLifecycleOwner, Observer {
             activity?.let {
-                if (instaViewModel.selectedPickleMedia.getType() != PickleMedia.Type.PHOTO) {
+                if (instaViewModel.selectedItem.media.mediaType != MEDIA_TYPE_IMAGE) {
                     showToast("video is not supported now")
                 } else if (binding.ivPreview.isOffFrame()) showToast("Image is off of the frame.")
                 else {
@@ -135,7 +136,7 @@ class InstaFragment : Fragment(), OnInstaEventListener {
                     else {
                         val dialogLayout = layoutInflater.inflate(R.layout.dialog_result, null)
                         val dialogImageView = dialogLayout.findViewById<ImageView>(R.id.iv_image)
-                        Glide.with(it).load(instaViewModel.selectedPickleMedia.getUri()).fitCenter()
+                        Glide.with(it).load(instaViewModel.selectedItem.uri).fitCenter()
                             .into(dialogImageView)
                         AlertDialog.Builder(it).setView(dialogLayout).show()
                     }
@@ -144,9 +145,9 @@ class InstaFragment : Fragment(), OnInstaEventListener {
         })
     }
 
-    private fun loadPickleMedia(pickleMedia: PickleMedia) {
-        if (pickleMedia.getType() == PickleMedia.Type.PHOTO) {
-            binding.ivPreview.setPickleMedia(pickleMedia)
+    private fun loadPickleMedia(item: PickleItem) {
+        if (item.media.mediaType == MEDIA_TYPE_IMAGE) {
+            binding.ivPreview.setPickleMedia(item)
             if (!binding.ivPreview.isEmpty()) {
                 if (instaViewModel.isAspectRatio.value == true) binding.ivPreview.setAspectRatio() else binding.ivPreview.setCropScale()
             }
@@ -154,15 +155,15 @@ class InstaFragment : Fragment(), OnInstaEventListener {
 //        TODO("VIDEO 에 대한 처리")
     }
 
-    override fun onItemClick(view: View?, pickleMedia: PickleMedia) {
-        instaViewModel.setSelected(pickleMedia)
-        instaViewModel.selectionManager.toggleItemSelected(pickleMedia.getId())
-        if (instaViewModel.selectedPickleMedia.getType() != PickleMedia.Type.PHOTO) {
+    override fun onItemClick(view: View?, item: PickleItem) {
+        instaViewModel.setSelected(item)
+        instaViewModel.selectionManager.toggleItemSelected(item.getId())
+        if (instaViewModel.selectedItem.media.mediaType != MEDIA_TYPE_IMAGE) {
             showToast("video is not supported now")
             binding.ivPreview.clear()
             return
         }
-        loadPickleMedia(pickleMedia)
+        loadPickleMedia(item)
         view?.let {
             binding.recyclerView.smoothScrollBy(0, it.top)
             binding.previewAppbarLayout.setExpanded(true)

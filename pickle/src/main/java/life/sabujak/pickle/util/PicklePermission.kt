@@ -2,6 +2,7 @@ package life.sabujak.pickle.util
 
 import android.Manifest
 import android.content.pm.PackageManager
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
@@ -9,9 +10,8 @@ import androidx.lifecycle.OnLifecycleEvent
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.toObservable
 import io.reactivex.subjects.AsyncSubject
-import life.sabujak.pickle.ui.PickleActivity
 
-class PicklePermission(val activity: PickleActivity):LifecycleObserver{
+class PicklePermission(val activity: AppCompatActivity):LifecycleObserver{
     private val logger = Logger.getLogger("PicklePermission")
 
     companion object{
