@@ -9,7 +9,7 @@
         <import type="android.view.View" />
         <variable
             name="item"
-            type="life.sabujak.pickle.data.entity.PickleMedia" />
+            type="life.sabujak.pickle.data.entity.PickleItem" />
         <variable
             name="instaSelectionManager"
             type="life.sabujak.pickle.ui.insta.InstaSelectionManager" />
@@ -42,7 +42,7 @@
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:background="#90FFFFFF"
-            android:visibility="@{instaSelectionManager.isSelected(item.id)? View.VISIBLE : View.GONE}"
+            android:visibility="@{instaSelectionManager.isChecked(item.id)? View.VISIBLE : View.GONE}"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"

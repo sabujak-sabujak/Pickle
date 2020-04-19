@@ -27,7 +27,7 @@
             android:paddingEnd="7dp"
             android:text="@{String.valueOf(viewModel.count)}"
             android:textColor="@{viewModel.textColor}"
-            android:textSize="10dp"
+            android:textSize="12sp"
             android:textStyle="bold"
             android:visibility="@{viewModel.isCountVisible? View.VISIBLE : View.GONE}"
             tools:text="100"
@@ -42,7 +42,7 @@
             android:gravity="center"
             android:text="@{viewModel.title}"
             android:textColor="@{viewModel.textColor}"
-            android:textSize="16dp"
+            android:textSize="16sp"
             tools:text="@string/select" />
     </LinearLayout>
 </layout>

@@ -1,18 +1,20 @@
 package life.sabujak.pickle.ui.insta
 
 import androidx.databinding.BaseObservable
+import androidx.lifecycle.MutableLiveData
+import life.sabujak.pickle.ui.Checkable
 import life.sabujak.pickle.ui.insta.internal.CropData
-import life.sabujak.pickle.util.InitMutableLiveData
 import life.sabujak.pickle.util.Logger
 
-class InstaSelectionManager : BaseObservable() {
+class InstaSelectionManager : BaseObservable(), Checkable {
     val logger = Logger.getLogger(this.javaClass.simpleName)
-    var lastselected: Long = -1
-    val selectionList = LinkedHashMap<Long, CropData>()
+    private var lastSelected: Long = -1
+    val selectionList = LinkedHashMap<Long, CropData?>()
 
-    val count = InitMutableLiveData(0)
+    val count = MutableLiveData(0)
 
-    val isMultiSelect = InitMutableLiveData(false)
+    val isMultiSelect = MutableLiveData<Boolean>(false)
+    val isCrop = MutableLiveData<Boolean>(false)
 
 
     fun setMultipleSelect(isMultiple: Boolean) {
@@ -21,20 +23,37 @@ class InstaSelectionManager : BaseObservable() {
         clear()
     }
 
-    fun isSelected(id: Long): Boolean {
-        logger.d("isChecked ${id}")
-        return lastselected == id
+    override fun isChecked(id: Long): Boolean {
+        return lastSelected == id
     }
 
-    fun isChecked(id: Long): Boolean {
-        return selectionList.contains(id)
+    override fun toggle(id: Long) {
+        logger.d("toggleItemSelected ${id}")
+        if (lastSelected == id) return
+        lastSelected = id
+        notifyChange()
     }
 
-    private fun isMultiSelect(): Boolean {
+    private fun isMultiSelect(): Boolean? {
         return isMultiSelect.value
     }
 
-    private fun setCheck(id: Long, checked: Boolean, cropData: CropData) {
+    private fun isCropSelect(): Boolean?{
+        return isCrop.value
+    }
+
+    override fun setChecked(id: Long, checked: Boolean) {
+        if (checked) {
+            selectionList.put(id, null)
+        } else {
+            selectionList.remove(id)
+        }
+
+        updateCount()
+        notifyChange()
+    }
+
+    private fun setChecked(id: Long, checked: Boolean, cropData: CropData) {
         if (checked) {
             selectionList.put(id, cropData)
         } else {
@@ -46,15 +65,15 @@ class InstaSelectionManager : BaseObservable() {
     }
 
     fun itemClick(id: Long, cropData: CropData?) {
-        logger.d("itemClick ${id}")
-
-        if (isMultiSelect()) {
+        if (isMultiSelect() == true && isCropSelect() == true) {
             cropData?.let {
-                setCheck(id, !isChecked(id), it)
+                setChecked(id, !isChecked(id), it)
             }
+        } else {
+            setChecked(id, !isChecked(id))
         }
-        if (lastselected == id) return
-        lastselected = id
+        if (lastSelected == id) return
+        lastSelected = id
         notifyChange()
     }
 
@@ -68,14 +87,13 @@ class InstaSelectionManager : BaseObservable() {
         this.count.value = selectionList.size
     }
 
-    fun getIndex(id: Long): Int {
+    private fun getIndex(id: Long): Int {
         val pos = ArrayList<Long>(selectionList.keys).indexOf(id)
         return pos
     }
 
     fun getPosition(id: Long): String {
         val index = getIndex(id)
-        logger.d("getPosition() ${index}")
         return if (index < 0) {
             ""
         } else {
@@ -83,7 +101,7 @@ class InstaSelectionManager : BaseObservable() {
         }
     }
 
-    fun setMultiCropData(id: Long = lastselected, cropData: CropData) {
+    fun setMultiCropData(id: Long = lastSelected, cropData: CropData) {
         selectionList.put(id, cropData)
         logger.d("setMultiCropData : ${id}, ${cropData}")
     }
@@ -91,5 +109,11 @@ class InstaSelectionManager : BaseObservable() {
     fun clear() {
         selectionList.clear()
         notifyChange()
+    }
+
+    fun setAspectRatio(){
+        for(key in selectionList.keys){
+            selectionList[key] = null
+        }
     }
 }

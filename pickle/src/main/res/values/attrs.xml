@@ -2,17 +2,20 @@
 <resources>
 
   <declare-styleable name="CropLayout">
-    <attr name="frame_width_percent" />
-    <attr name="frame_height_percent" />
-    <attr name="max_scale" />
-    <attr name="overlay_shape" />
-    <attr name="with_border" />
-    <attr name="background_alpha" />
-    <attr name="custom_shape_layout" />
+    <attr name="frame_width_percent"
+        format="fraction"/>
+    <attr name="frame_height_percent"
+        format="fraction"/>
+    <attr name="max_scale"
+        format="float"/>
+    <attr name="with_border"
+        format="boolean"/>
+    <attr name="background_alpha"
+        format="float"/>
   </declare-styleable>
 
   <declare-styleable name="CropOverlay">
-    <attr name="cropme_with_border" />
-    <attr name="cropme_background_alpha" />
+    <attr name="cropme_with_border"
+        format="boolean"/>
   </declare-styleable>
 </resources>

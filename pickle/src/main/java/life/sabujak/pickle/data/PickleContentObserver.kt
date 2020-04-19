@@ -24,13 +24,8 @@ class PickleContentObserver(val activity:FragmentActivity) : ContentObserver(Han
 
     override fun onChange(selfChange: Boolean, uri: Uri?) {
         super.onChange(selfChange, uri)
-        contentChangedEvent.call()
+        contentChangedEvent.postValue(null)
         logger.i("onChange : selfChange = $selfChange uri = $uri")
-    }
-
-    override fun onChange(selfChange: Boolean) {
-        super.onChange(selfChange)
-        logger.i("onChange : selfChange = $selfChange")
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)

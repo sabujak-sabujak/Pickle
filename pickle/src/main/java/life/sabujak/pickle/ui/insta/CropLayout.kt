@@ -19,13 +19,12 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
 import life.sabujak.pickle.R
-import life.sabujak.pickle.data.entity.PickleMedia
+import life.sabujak.pickle.data.entity.PickleItem
 import life.sabujak.pickle.ui.insta.internal.*
 import life.sabujak.pickle.ui.insta.internal.GestureAnimation
 import life.sabujak.pickle.ui.insta.internal.GestureAnimator
 import life.sabujak.pickle.util.Logger
 import java.util.concurrent.CopyOnWriteArrayList
-import kotlin.concurrent.thread
 
 /**
  * Layout to show Image and Frame.
@@ -48,7 +47,7 @@ class CropLayout @JvmOverloads constructor(
     private lateinit var animation: GestureAnimation
 
     private var cropImageView: CropImageView
-    private var pickleMedia: PickleMedia? = null
+    private var item: PickleItem? = null
 
     private val cropOverlay: RectangleCropOverlay by lazy {
         RectangleCropOverlay(context, null, 0, attrs)
@@ -56,9 +55,10 @@ class CropLayout @JvmOverloads constructor(
     private var frameCache: RectF? = null
     private val listeners = CopyOnWriteArrayList<OnCropListener>()
 
-    private var cropLogListener: CropDataListener? = null
+    private var cropDataListener: CropDataListener? = null
 
     init {
+        logger.d("init")
         val attr = context.obtainStyledAttributes(attrs, R.styleable.CropLayout, 0, 0)
         cropImageView = CropImageView(context, null, 0)
         cropOverlay.layoutParams = LayoutParams(MATCH_PARENT, MATCH_PARENT, Gravity.CENTER)
@@ -88,6 +88,7 @@ class CropLayout @JvmOverloads constructor(
         val vto = viewTreeObserver
         vto.addOnPreDrawListener(object : ViewTreeObserver.OnPreDrawListener {
             override fun onPreDraw(): Boolean {
+                logger.d("addOnPreDrawListener")
                 val totalWidth = measuredWidth.toFloat()
                 val totalHeight = measuredHeight.toFloat()
                 val frameWidth = measuredWidth * percentWidth
@@ -121,8 +122,8 @@ class CropLayout @JvmOverloads constructor(
         listeners.remove(listener)
     }
 
-    fun setOnCropLogListener(listener: CropDataListener){
-        cropLogListener = listener
+    fun setOnCropDataListener(listener: CropDataListener){
+        cropDataListener = listener
     }
 
     /**
@@ -149,6 +150,7 @@ class CropLayout @JvmOverloads constructor(
      * If cropping is successful [OnCropListener.onSuccess] would be called, otherwise [OnCropListener.onFailure].
      * This [crop] only works when the image is fully on the frame, otherwise [crop] does nothing.
      */
+    @MainThread
     fun crop() {
         if (isOffFrame()) {
             logger.d("Image is off of the frame.")
@@ -177,9 +179,7 @@ class CropLayout @JvmOverloads constructor(
                         listener.onFailure(e)
                     }
                 }
-
             }
-
         }
     }
 
@@ -215,7 +215,7 @@ class CropLayout @JvmOverloads constructor(
         cropImageView.layoutParams = LayoutParams(WRAP_CONTENT, WRAP_CONTENT, Gravity.CENTER)
         cropImageView.requestLayout()
         animator = GestureAnimator.of(cropImageView, frame, scale)
-        animation = GestureAnimation(cropOverlay, animator, cropLogListener)
+        animation = GestureAnimation(cropOverlay, animator, cropDataListener)
         animation.start()
 //        val position = IntArray(2).apply { cropImageView.getLocationOnScreen(this) }
 //        logger.d("setCropScale() : cropImageView ${cropImageView.left}, ${cropImageView.top}, ${cropImageView.right}, ${cropImageView.bottom}, ${cropImageView.x}, ${cropImageView.y}" +
@@ -246,13 +246,13 @@ class CropLayout @JvmOverloads constructor(
     }
 
     fun isEmpty(): Boolean {
-        pickleMedia?.let { return false }
+        this.item?.let{ return false}
         return true
     }
 
-    fun setPickleMedia(pickle: PickleMedia) {
-        pickleMedia = pickle
-        Glide.with(this.context).load(pickleMedia?.getUri()).into(cropImageView)
+    fun setPickleMedia(item: PickleItem) {
+        this.item = item
+        Glide.with(this.context).load(this.item?.uri).into(cropImageView)
     }
 
     fun clear() {
