@@ -22,13 +22,6 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-<!--            <androidx.appcompat.widget.Toolbar-->
-<!--                android:id="@+id/toolbar"-->
-<!--                android:layout_width="match_parent"-->
-<!--                android:layout_height="?android:attr/actionBarSize"-->
-<!--                app:titleTextColor="@android:color/white"-->
-<!--                app:layout_scrollFlags="scroll" />-->
-
             <com.google.android.material.appbar.CollapsingToolbarLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
