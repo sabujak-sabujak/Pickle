@@ -19,15 +19,12 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
 import life.sabujak.pickle.R
-import life.sabujak.pickle.data.entity.Media
 import life.sabujak.pickle.data.entity.PickleItem
-import life.sabujak.pickle.ui.insta.internal.CropData
-import life.sabujak.pickle.ui.insta.internal.CropTransformation
+import life.sabujak.pickle.ui.insta.internal.*
 import life.sabujak.pickle.ui.insta.internal.GestureAnimation
 import life.sabujak.pickle.ui.insta.internal.GestureAnimator
 import life.sabujak.pickle.util.Logger
 import java.util.concurrent.CopyOnWriteArrayList
-import kotlin.concurrent.thread
 
 /**
  * Layout to show Image and Frame.
@@ -58,7 +55,10 @@ class CropLayout @JvmOverloads constructor(
     private var frameCache: RectF? = null
     private val listeners = CopyOnWriteArrayList<OnCropListener>()
 
+    private var cropDataListener: CropDataListener? = null
+
     init {
+        logger.d("init")
         val attr = context.obtainStyledAttributes(attrs, R.styleable.CropLayout, 0, 0)
         cropImageView = CropImageView(context, null, 0)
         cropOverlay.layoutParams = LayoutParams(MATCH_PARENT, MATCH_PARENT, Gravity.CENTER)
@@ -88,6 +88,7 @@ class CropLayout @JvmOverloads constructor(
         val vto = viewTreeObserver
         vto.addOnPreDrawListener(object : ViewTreeObserver.OnPreDrawListener {
             override fun onPreDraw(): Boolean {
+                logger.d("addOnPreDrawListener")
                 val totalWidth = measuredWidth.toFloat()
                 val totalHeight = measuredHeight.toFloat()
                 val frameWidth = measuredWidth * percentWidth
@@ -121,6 +122,10 @@ class CropLayout @JvmOverloads constructor(
         listeners.remove(listener)
     }
 
+    fun setOnCropDataListener(listener: CropDataListener){
+        cropDataListener = listener
+    }
+
     /**
      * Check if image is off of the frame.
      *
@@ -151,40 +156,50 @@ class CropLayout @JvmOverloads constructor(
             logger.d("Image is off of the frame.")
             return
         }
-        val frame = frameCache ?: return
-        val targetRect = Rect().apply { cropImageView.getHitRect(this) }
         val source = (cropImageView.drawable as BitmapDrawable).bitmap
-
-        thread {
-            val leftOffset = (frame.left - targetRect.left).toInt()
-            val topOffset = (frame.top - targetRect.top).toInt()
-            val width = frame.width().toInt()
-            val height = frame.height().toInt()
-            val cropData =
-                CropData(leftOffset, topOffset, width, height, targetRect.width(), targetRect.height())
-            logger.d("cropData : ${leftOffset}, ${topOffset}, ${width}, ${height}, ${source.width}, ${source.height}")
-
-            try {
-                Glide.with(context).asBitmap().load(source)
-                    .transform(CropTransformation(cropData)).into(object : CustomTarget<Bitmap>() {
-                        override fun onResourceReady(
-                            result: Bitmap,
-                            transition: Transition<in Bitmap>?
-                        ) {
-                            for (listener in listeners) {
-                                listener.onSuccess(result)
+        frameCache?.let{
+            getCropData()?.let{
+                try{
+                    Glide.with(context).asBitmap().load(source)
+                        .transform(CropTransformation(it)).into(object : CustomTarget<Bitmap>() {
+                            override fun onResourceReady(
+                                result: Bitmap,
+                                transition: Transition<in Bitmap>?
+                            ) {
+                                for (listener in listeners) {
+                                    listener.onSuccess(result)
+                                }
                             }
-                        }
 
-                        override fun onLoadCleared(placeholder: Drawable?) {
-                        }
-                    })
-            } catch (e: Exception) {
-                for (listener in listeners) {
-                    listener.onFailure(e)
+                            override fun onLoadCleared(placeholder: Drawable?) {
+                            }
+                        })
+                } catch (e: Exception) {
+                    for (listener in listeners) {
+                        listener.onFailure(e)
+                    }
                 }
             }
         }
+    }
+
+    fun getCropData(): CropData? {
+        val targetRect = Rect().apply { cropImageView.getHitRect(this) }
+        frameCache?.let {
+            val leftOffset = (it.left - targetRect.left).toInt()
+            val topOffset = (it.top - targetRect.top).toInt()
+            val width = it.width().toInt()
+            val height = it.height().toInt()
+            return CropData(
+                leftOffset,
+                topOffset,
+                width,
+                height,
+                targetRect.width(),
+                targetRect.height()
+            )
+        }
+        return null
     }
 
     fun setCropScale() {
@@ -200,7 +215,7 @@ class CropLayout @JvmOverloads constructor(
         cropImageView.layoutParams = LayoutParams(WRAP_CONTENT, WRAP_CONTENT, Gravity.CENTER)
         cropImageView.requestLayout()
         animator = GestureAnimator.of(cropImageView, frame, scale)
-        animation = GestureAnimation(cropOverlay, animator)
+        animation = GestureAnimation(cropOverlay, animator, cropDataListener)
         animation.start()
 //        val position = IntArray(2).apply { cropImageView.getLocationOnScreen(this) }
 //        logger.d("setCropScale() : cropImageView ${cropImageView.left}, ${cropImageView.top}, ${cropImageView.right}, ${cropImageView.bottom}, ${cropImageView.x}, ${cropImageView.y}" +
@@ -241,7 +256,7 @@ class CropLayout @JvmOverloads constructor(
     }
 
     fun clear() {
-        cropImageView.setImageResource(0)
+        cropImageView.setImageResource(android.R.color.transparent)
     }
 
     companion object {

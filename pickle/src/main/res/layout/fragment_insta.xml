@@ -11,32 +11,32 @@
     <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:app="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        >
+        android:background="#000000">
 
         <com.google.android.material.appbar.AppBarLayout
             android:id="@+id/preview_appbar_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:background="#000000">
+            android:orientation="vertical">
 
             <androidx.appcompat.widget.Toolbar
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="?android:attr/actionBarSize"
-                app:layout_scrollFlags="scroll|enterAlways"/>
+                app:titleTextColor="@android:color/white"
+                app:layout_scrollFlags="scroll" />
 
             <com.google.android.material.appbar.CollapsingToolbarLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:fitsSystemWindows="true"
-                android:minHeight="56dp"
-                app:layout_scrollFlags="scroll|exitUntilCollapsed|enterAlways|snap">
+                android:minHeight="48dp"
+                android:background="#000000"
+                app:layout_scrollFlags="scroll|exitUntilCollapsed">
 
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    >
+                    android:layout_height="wrap_content">
 
                     <life.sabujak.pickle.ui.insta.CropLayout
                         android:id="@+id/iv_preview"
@@ -45,22 +45,38 @@
                         app:background_alpha="0.8"
                         app:frame_height_percent="100%"
                         app:frame_width_percent="100%"
-                        app:max_scale="5.0"
-                        app:with_border="true"
                         app:layout_constraintDimensionRatio="h,1:1"
                         app:layout_constraintTop_toTopOf="parent"
-                        />
+                        app:max_scale="5.0"
+                        app:with_border="true" />
+
                     <ImageView
                         android:id="@+id/iv_ratio"
                         android:layout_width="36dp"
                         android:layout_height="36dp"
                         android:layout_margin="8dp"
+                        android:background="@drawable/ic_insta_option_off"
                         android:clickable="true"
                         android:focusable="true"
                         android:onClick="@{()->viewModel.ratioClicked()}"
+                        android:padding="6dp"
                         android:src="@drawable/ic_ratio_white_24dp"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintLeft_toLeftOf="parent" />
+
+                    <ImageView
+                        android:id="@+id/iv_multi_select"
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:layout_margin="8dp"
+                        android:background="@{viewModel.isMultipleSelect() ? @drawable/ic_insta_option_on: @drawable/ic_insta_option_off}"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:onClick="@{()->viewModel.multipleClicked()}"
+                        android:padding="6dp"
+                        android:src="@drawable/ic_multi_select_white_24dp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintRight_toRightOf="parent" />
                 </androidx.constraintlayout.widget.ConstraintLayout>
             </com.google.android.material.appbar.CollapsingToolbarLayout>
 
