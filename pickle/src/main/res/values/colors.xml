@@ -4,6 +4,7 @@
     <color name="TC02">#FFFFFF</color>
     <color name="WT">#FFFFFF</color>
     <color name="BK_20">#33000000</color>
+    <color name="BK_30">#4D000000</color>
     <color name="BK_50">#88000000</color>
 
     <color name="background">@color/GR50</color>

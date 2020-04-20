@@ -1,5 +1,6 @@
 package life.sabujak.pickle
 
+import android.view.ViewGroup
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
 import life.sabujak.pickle.ui.common.OnResultListener
@@ -14,9 +15,17 @@ object Pickle {
         )
     }
 
-    fun start(fragmentManager: FragmentManager){
+//    fun start(fragmentManager: FragmentManager, containerId: Int){
+//        fragmentManager.beginTransaction()
+//            .add(containerId, InstaFragment(),"Insta")
+//            .addToBackStack(null)
+//            .commit()
+//    }
+
+    fun start(fragmentManager: FragmentManager, containerId: Int, listener: OnResultListener){
         fragmentManager.beginTransaction()
-            .add(InstaFragment(),"Insta")
+            .add(containerId, InstaFragment(Config.Builder(listener).build()),"Insta")
+            .addToBackStack(null)
             .commit()
     }
 }

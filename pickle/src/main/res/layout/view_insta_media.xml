@@ -42,12 +42,28 @@
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:background="#90FFFFFF"
-            android:visibility="@{instaSelectionManager.isChecked(item.id) ? View.VISIBLE : View.GONE}"
+            android:visibility="@{instaSelectionManager.isChecked(item.id)? View.VISIBLE : View.GONE}"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
             />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="4dp"
+            android:gravity="center"
+            android:minWidth="30dp"
+            android:minHeight="30dp"
+            android:textColor="@color/TC02"
+            android:background="@{instaSelectionManager.isChecked(item.id) ? @drawable/ic_item_selection_on : @drawable/ic_item_selection_off}"
+            android:visibility="@{instaSelectionManager.isMultiSelect()? View.VISIBLE : View.GONE}"
+            android:text="@{instaSelectionManager.getPosition(item.id)}"
+            app:layout_constraintDimensionRatio="1:1"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:background="@drawable/ic_item_selection_on"
+            tools:text="100" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </layout>
