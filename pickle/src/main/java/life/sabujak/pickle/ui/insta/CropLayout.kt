@@ -239,10 +239,10 @@ class CropLayout @JvmOverloads constructor(
         cropImageView.scaleX = 1f
         cropImageView.scaleY = 1f
         cropImageView.requestLayout()
-//        val position = IntArray(2).apply { cropImageView.getLocationOnScreen(this) }
-//        logger.d("setAspectRatio() : cropImageView ${cropImageView.left}, ${cropImageView.top}, ${cropImageView.right}, ${cropImageView.bottom}, ${cropImageView.x}, ${cropImageView.y}" +
-//                " scaleX : ${cropImageView.scaleX} ")
-//        logger.d("setAspectRatio() : cropImageView realposition ${position[0]}, ${position[1]}")
+        val position = IntArray(2).apply { cropImageView.getLocationOnScreen(this) }
+        logger.d("setAspectRatio() : cropImageView ${cropImageView.left}, ${cropImageView.top}, ${cropImageView.right}, ${cropImageView.bottom}, ${cropImageView.x}, ${cropImageView.y}" +
+                " scaleX : ${cropImageView.scaleX} ")
+        logger.d("setAspectRatio() : cropImageView realposition ${position[0]}, ${position[1]}")
     }
 
     fun isEmpty(): Boolean {

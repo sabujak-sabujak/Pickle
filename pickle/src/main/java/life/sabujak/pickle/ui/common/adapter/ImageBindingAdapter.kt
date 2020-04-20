@@ -11,9 +11,9 @@ fun setImage(view: ImageView, pickleItem: PickleItem?) {
     pickleItem?.uri?.let {
         val rm = Glide.with(view)
         if(Runtime.getRuntime().maxMemory()> 134217728){
-            rm.load(it).into(view)
+            rm.load(it).centerCrop().into(view)
         }else{
-            rm.asBitmap().load(it).into(view)
+            rm.asBitmap().load(it).centerCrop().into(view)
         }
 
     }

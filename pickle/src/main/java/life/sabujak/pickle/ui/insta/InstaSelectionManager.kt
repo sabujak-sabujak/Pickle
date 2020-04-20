@@ -20,7 +20,7 @@ class InstaSelectionManager : BaseObservable(), Checkable {
     fun setMultipleSelect(isMultiple: Boolean) {
         logger.d("setMultipleSelect ${isMultiple}")
         isMultiSelect.postValue(isMultiple)
-        clear()
+        setChecked(lastSelected, isMultiple)
     }
 
     override fun isChecked(id: Long): Boolean {
@@ -107,6 +107,7 @@ class InstaSelectionManager : BaseObservable(), Checkable {
 
     fun clear() {
         selectionList.clear()
+        updateCount()
         notifyChange()
     }
 

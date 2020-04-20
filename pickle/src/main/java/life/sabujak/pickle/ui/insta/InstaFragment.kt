@@ -22,7 +22,6 @@ import life.sabujak.pickle.Config
 import life.sabujak.pickle.R
 import life.sabujak.pickle.data.entity.PickleItem
 import life.sabujak.pickle.databinding.FragmentInstaBinding
-import life.sabujak.pickle.ui.common.OptionMenuViewModel
 import life.sabujak.pickle.ui.insta.internal.CropDataListener
 import life.sabujak.pickle.util.Logger
 import life.sabujak.pickle.util.ext.showToast
@@ -32,7 +31,7 @@ class InstaFragment constructor() : Fragment(), OnInstaEventListener {
 
     lateinit var binding: FragmentInstaBinding
     private val instaViewModel: InstaViewModel by viewModels()
-    private val optionMenuViewModel: OptionMenuViewModel by viewModels()
+    private val instaTopViewModel: InstaTopViewModel by viewModels()
     private val instaAdapter by lazy {
         InstaAdapter(lifecycle, instaViewModel.selectionManager, this)
     }
@@ -49,7 +48,7 @@ class InstaFragment constructor() : Fragment(), OnInstaEventListener {
         super.onAttach(context)
         activity?.let {
             (it as? AppCompatActivity)?.supportActionBar?.hide()
-            optionMenuViewModel.setCountable(false)
+            instaTopViewModel.setCountable(false)
         }
     }
 
@@ -73,6 +72,7 @@ class InstaFragment constructor() : Fragment(), OnInstaEventListener {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_insta, container, false)
         binding.apply {
             viewModel = instaViewModel
+            menuViewModel = instaTopViewModel
             recyclerView.adapter = instaAdapter
             lifecycleOwner = viewLifecycleOwner
             recyclerView.layoutManager = gridLayoutManager
@@ -86,7 +86,6 @@ class InstaFragment constructor() : Fragment(), OnInstaEventListener {
                 })
                 (it as CoordinatorLayout.LayoutParams).behavior = behavior
             }
-            (activity as? AppCompatActivity)?.setSupportActionBar(binding.toolbar)
             ivPreview.setOnCropDataListener(object : CropDataListener {
                 override fun onActionUp() {
                     val cropData = ivPreview.getCropData()
@@ -96,11 +95,11 @@ class InstaFragment constructor() : Fragment(), OnInstaEventListener {
                 }
             })
             ivPreview.addOnCropListener(object : OnCropListener {
-                override fun onSuccess(result: Bitmap) {
+                override fun onSuccess(bitmap: Bitmap) {
                     val dialogLayout = layoutInflater.inflate(R.layout.dialog_result, container, false)
                     var dialogImageView = dialogLayout.findViewById<ImageView>(R.id.iv_image)
                     context?.let {
-                        Glide.with(dialogLayout.context).load(result).fitCenter()
+                        Glide.with(dialogLayout.context).load(bitmap).fitCenter()
                             .into(dialogImageView)
                         val alertDialog = AlertDialog.Builder(it)
                         alertDialog.setOnDismissListener {
@@ -137,7 +136,6 @@ class InstaFragment constructor() : Fragment(), OnInstaEventListener {
             }
         })
         instaViewModel.isMultipleSelect.observe(viewLifecycleOwner, Observer { it ->
-            instaViewModel.selectionManager.clear()
             if (it && !binding.ivPreview.isEmpty()) {
                 binding.ivPreview.getCropData()?.let { data ->
                     instaViewModel.selectionManager.setMultiCropData(cropData = data)
@@ -146,6 +144,7 @@ class InstaFragment constructor() : Fragment(), OnInstaEventListener {
             if (it) binding.ivRatio.visibility = INVISIBLE
             else binding.ivRatio.visibility = VISIBLE
             instaViewModel.setAspectRatio(it)
+            instaTopViewModel.setCountable(it)
         })
         instaViewModel.initialLoadState.observe(viewLifecycleOwner, Observer {
             logger.d("initialLoadState = $it")
@@ -154,18 +153,30 @@ class InstaFragment constructor() : Fragment(), OnInstaEventListener {
             logger.d("dataSourceState = $it")
         })
 
-        optionMenuViewModel.clickEvent.observe(viewLifecycleOwner, Observer {
+        instaTopViewModel.clickEvent.observe(viewLifecycleOwner, Observer {
             activity?.let {
                 if (instaViewModel.selectedItem.media.mediaType != MEDIA_TYPE_IMAGE) {
                     showToast("video is not supported now")
-                } else if (binding.ivPreview.isOffFrame()) showToast("Image is off of the frame.")
+                }
                 else {
-                    if (instaViewModel.isAspectRatio.value == false) binding.ivPreview.crop()
+                    if (instaViewModel.isAspectRatio.value == false) {
+                        if (binding.ivPreview.isOffFrame()) showToast("Image is off of the frame.")
+                        else binding.ivPreview.crop()
+                    }
                     else {
                         config.onResultListener.onSuccess(instaViewModel.getPickleResult())
                         it.supportFragmentManager.popBackStack()
                     }
                 }
+            }
+        })
+        instaTopViewModel.isCountVisible.observe(viewLifecycleOwner, Observer {
+            if(it){
+                instaViewModel.selectionManager.count.observe(viewLifecycleOwner, Observer{ countInfo->
+                    instaTopViewModel.count.postValue(countInfo)
+                })
+            } else {
+                instaViewModel.selectionManager.count.removeObservers(viewLifecycleOwner)
             }
         })
     }
@@ -198,8 +209,12 @@ class InstaFragment constructor() : Fragment(), OnInstaEventListener {
         }
     }
 
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        optionMenuViewModel.onCreateOptionMenu(menu)
-        super.onCreateOptionsMenu(menu, inflater)
+    private fun showActionBar(){
+        (activity as? AppCompatActivity)?.supportActionBar?.show()
+    }
+
+    override fun onDetach() {
+        showActionBar()
+        super.onDetach()
     }
 }

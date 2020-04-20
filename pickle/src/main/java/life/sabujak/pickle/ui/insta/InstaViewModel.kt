@@ -70,6 +70,7 @@ class InstaViewModel(application: Application) : AndroidViewModel(application),P
     }
 
     fun multipleClicked() {
+        selectionManager.clear()
         if(_isMultipleSelect.value == true) {
             _isMultipleSelect.postValue(false)
             selectionManager.setMultipleSelect(false)
@@ -83,14 +84,13 @@ class InstaViewModel(application: Application) : AndroidViewModel(application),P
     fun getPickleResult(): PickleResult {
 
         val mediaList = ArrayList<Media>()
-        items.value?.forEach { pickleItem ->
-            if(pickleItem!=null){
-                for(key in selectionManager.selectionList.keys){
-                    if(pickleItem.getId() == key)
-                        mediaList.add(pickleItem.media)
-                }
+        for(key in selectionManager.selectionList.keys){
+            items.value?.forEach{ pickleItem ->
+                if( pickleItem != null && pickleItem.getId() == key)
+                    mediaList.add(pickleItem.media)
             }
         }
+
         return PickleResult(mediaList)
     }
 }
