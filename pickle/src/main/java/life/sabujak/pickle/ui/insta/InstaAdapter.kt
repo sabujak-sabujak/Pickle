@@ -6,13 +6,12 @@ import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
 import life.sabujak.pickle.BR
 import life.sabujak.pickle.R
-import life.sabujak.pickle.data.entity.Media
 import life.sabujak.pickle.data.entity.PickleItem
 import life.sabujak.pickle.ui.common.BindingHolder
 import life.sabujak.pickle.ui.common.adapter.PickleBindingComponent
 import life.sabujak.pickle.util.Logger
 
-class InstaAdapter(val lifecycle: Lifecycle, val selectionManager:InstaSelectionManager, val onEventListener: OnInstaEventListener ) : PagedListAdapter<PickleItem, BindingHolder>(diffCallback) {
+class InstaAdapter(val lifecycle: Lifecycle, private val selectionManager:InstaSelectionManager, val onEventListener: OnInstaEventListener ) : PagedListAdapter<PickleItem, BindingHolder>(diffCallback) {
 
     val logger = Logger.getLogger(this.javaClass.simpleName)
 

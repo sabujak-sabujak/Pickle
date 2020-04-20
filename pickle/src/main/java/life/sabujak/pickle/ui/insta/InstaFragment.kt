@@ -2,8 +2,6 @@ package life.sabujak.pickle.ui.insta
 
 import android.content.Context
 import android.graphics.Bitmap
-import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.provider.MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE
 import android.view.*
@@ -24,9 +22,7 @@ import life.sabujak.pickle.Config
 import life.sabujak.pickle.R
 import life.sabujak.pickle.data.entity.PickleItem
 import life.sabujak.pickle.databinding.FragmentInstaBinding
-import life.sabujak.pickle.ui.common.OnResultListener
 import life.sabujak.pickle.ui.common.OptionMenuViewModel
-import life.sabujak.pickle.ui.dialog.TopBarViewModel
 import life.sabujak.pickle.ui.insta.internal.CropDataListener
 import life.sabujak.pickle.util.Logger
 import life.sabujak.pickle.util.ext.showToast
@@ -101,7 +97,7 @@ class InstaFragment constructor() : Fragment(), OnInstaEventListener {
             })
             ivPreview.addOnCropListener(object : OnCropListener {
                 override fun onSuccess(result: Bitmap) {
-                    val dialogLayout = layoutInflater.inflate(R.layout.dialog_result, null)
+                    val dialogLayout = layoutInflater.inflate(R.layout.dialog_result, container, false)
                     var dialogImageView = dialogLayout.findViewById<ImageView>(R.id.iv_image)
                     context?.let {
                         Glide.with(dialogLayout.context).load(result).fitCenter()
@@ -131,7 +127,7 @@ class InstaFragment constructor() : Fragment(), OnInstaEventListener {
             logger.d("submitList to Adapter")
             instaAdapter.submitList(pagedList, Runnable {
                 pagedList?.let {
-                    if (it.size != 0) onItemClick(null, it.get(0)!!)
+                    if (it.size != 0) onItemClick(null, it[0]!!)
                 }
             })
         })
@@ -140,11 +136,11 @@ class InstaFragment constructor() : Fragment(), OnInstaEventListener {
                 if (it) binding.ivPreview.setAspectRatio() else binding.ivPreview.setCropScale()
             }
         })
-        instaViewModel.isMultipleSelect.observe(viewLifecycleOwner, Observer {
+        instaViewModel.isMultipleSelect.observe(viewLifecycleOwner, Observer { it ->
             instaViewModel.selectionManager.clear()
             if (it && !binding.ivPreview.isEmpty()) {
-                binding.ivPreview.getCropData()?.let {
-                    instaViewModel.selectionManager.setMultiCropData(cropData = it)
+                binding.ivPreview.getCropData()?.let { data ->
+                    instaViewModel.selectionManager.setMultiCropData(cropData = data)
                 }
             }
             if (it) binding.ivRatio.visibility = INVISIBLE

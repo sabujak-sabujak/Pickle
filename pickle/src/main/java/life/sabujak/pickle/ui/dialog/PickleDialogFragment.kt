@@ -2,7 +2,6 @@ package life.sabujak.pickle.ui.dialog
 
 import android.app.Dialog
 import android.os.Bundle
-import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup

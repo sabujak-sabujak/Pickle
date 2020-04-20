@@ -25,7 +25,7 @@ class RectangleCropOverlay @JvmOverloads constructor(
   private val cropPaint: Paint
   private val borderPaint: Paint?
 
-  protected var frame: RectF? = null
+  private var frame: RectF? = null
     private set
 
   init {
@@ -33,7 +33,7 @@ class RectangleCropOverlay @JvmOverloads constructor(
     val withBorder: Boolean
 
     if (cropOverlayAttrs != null) {
-      val a = context.obtainStyledAttributes(cropOverlayAttrs, R.styleable.CropOverlay, 0, 0)
+      val a = context.obtainStyledAttributes(cropOverlayAttrs, R.styleable.RectangleCropOverlay, 0, 0)
       try {
         backgroundAlpha = a.getFraction(
           R.styleable.CropLayout_background_alpha,
@@ -42,7 +42,7 @@ class RectangleCropOverlay @JvmOverloads constructor(
           DEFAULT_BACKGROUND_ALPHA
         ) * COLOR_DENSITY
         withBorder = a.getBoolean(
-          R.styleable.CropOverlay_cropme_with_border,
+          R.styleable.RectangleCropOverlay_cropme_with_border,
           DEFAULT_WITH_BORDER
         )
       } finally {
@@ -88,11 +88,11 @@ class RectangleCropOverlay @JvmOverloads constructor(
     this.frame = frame
   }
 
-  final override fun setWillNotDraw(willNotDraw: Boolean) {
+  override fun setWillNotDraw(willNotDraw: Boolean) {
     super.setWillNotDraw(willNotDraw)
   }
 
-  final override fun setLayerType(layerType: Int, paint: Paint?) {
+  override fun setLayerType(layerType: Int, paint: Paint?) {
     super.setLayerType(layerType, paint)
   }
 

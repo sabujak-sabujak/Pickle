@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
-import life.sabujak.pickle.Config
 import life.sabujak.pickle.Pickle
 import life.sabujak.pickle.data.entity.PickleResult
 import life.sabujak.pickle.ui.common.OnResultListener

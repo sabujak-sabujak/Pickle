@@ -1,6 +1,5 @@
 package life.sabujak.picklesample
 
-import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.widget.ImageView
 import androidx.databinding.BindingAdapter

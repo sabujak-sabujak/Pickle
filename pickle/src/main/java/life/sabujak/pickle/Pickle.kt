@@ -1,8 +1,6 @@
 package life.sabujak.pickle
 
-import android.view.ViewGroup
 import androidx.fragment.app.FragmentManager
-import androidx.fragment.app.FragmentTransaction
 import life.sabujak.pickle.ui.common.OnResultListener
 import life.sabujak.pickle.ui.dialog.PickleDialogFragment
 import life.sabujak.pickle.ui.insta.InstaFragment

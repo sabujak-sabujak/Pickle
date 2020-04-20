@@ -2,7 +2,6 @@ package life.sabujak.pickle.data.entity
 
 import android.content.ContentUris
 import android.net.Uri
-import android.renderscript.BaseObj
 import androidx.databinding.BaseObservable
 import life.sabujak.pickle.data.PickleDataSource
 import life.sabujak.pickle.ui.Checkable

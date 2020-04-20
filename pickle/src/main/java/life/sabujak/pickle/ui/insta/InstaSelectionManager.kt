@@ -44,7 +44,7 @@ class InstaSelectionManager : BaseObservable(), Checkable {
 
     override fun setChecked(id: Long, checked: Boolean) {
         if (checked) {
-            selectionList.put(id, null)
+            selectionList[id] = null
         } else {
             selectionList.remove(id)
         }
@@ -55,7 +55,7 @@ class InstaSelectionManager : BaseObservable(), Checkable {
 
     private fun setChecked(id: Long, checked: Boolean, cropData: CropData) {
         if (checked) {
-            selectionList.put(id, cropData)
+            selectionList[id] = cropData
         } else {
             selectionList.remove(id)
         }
@@ -88,8 +88,7 @@ class InstaSelectionManager : BaseObservable(), Checkable {
     }
 
     private fun getIndex(id: Long): Int {
-        val pos = ArrayList<Long>(selectionList.keys).indexOf(id)
-        return pos
+        return ArrayList(selectionList.keys).indexOf(id)
     }
 
     fun getPosition(id: Long): String {
@@ -102,7 +101,7 @@ class InstaSelectionManager : BaseObservable(), Checkable {
     }
 
     fun setMultiCropData(id: Long = lastSelected, cropData: CropData) {
-        selectionList.put(id, cropData)
+        selectionList[id] = cropData
         logger.d("setMultiCropData : ${id}, ${cropData}")
     }
 
