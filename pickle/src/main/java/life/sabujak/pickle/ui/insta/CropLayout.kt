@@ -208,8 +208,8 @@ class CropLayout @JvmOverloads constructor(
         cropImageView.scaleY = 1f
         cropImageView.top = top
         cropImageView.left = left
-        cropImageView.x = 0f
-        cropImageView.y = 0f
+        cropImageView.x = left.toFloat()
+        cropImageView.y = top.toFloat()
         cropImageView.scaleType = ImageView.ScaleType.CENTER_CROP
         cropImageView.adjustViewBounds = true
         cropImageView.layoutParams = LayoutParams(WRAP_CONTENT, WRAP_CONTENT, Gravity.CENTER)
@@ -232,17 +232,17 @@ class CropLayout @JvmOverloads constructor(
         cropImageView.left = left
         cropImageView.right = right
         cropImageView.bottom = bottom
-        cropImageView.x = 0f
-        cropImageView.y = 0f
+        cropImageView.x = left.toFloat()
+        cropImageView.y = top.toFloat()
         cropImageView.maxWidth = width
         cropImageView.maxHeight = height
         cropImageView.scaleX = 1f
         cropImageView.scaleY = 1f
         cropImageView.requestLayout()
-        val position = IntArray(2).apply { cropImageView.getLocationOnScreen(this) }
-        logger.d("setAspectRatio() : cropImageView ${cropImageView.left}, ${cropImageView.top}, ${cropImageView.right}, ${cropImageView.bottom}, ${cropImageView.x}, ${cropImageView.y}" +
-                " scaleX : ${cropImageView.scaleX} ")
-        logger.d("setAspectRatio() : cropImageView realposition ${position[0]}, ${position[1]}")
+//        val position = IntArray(2).apply { cropImageView.getLocationOnScreen(this) }
+//        logger.d("setAspectRatio() : cropImageView ${cropImageView.left}, ${cropImageView.top}, ${cropImageView.right}, ${cropImageView.bottom}, ${cropImageView.x}, ${cropImageView.y}" +
+//                " scaleX : ${cropImageView.scaleX} ")
+//        logger.d("setAspectRatio() : cropImageView realposition ${position[0]}, ${position[1]}")
     }
 
     fun isEmpty(): Boolean {
