@@ -16,6 +16,7 @@ import android.widget.FrameLayout
 import android.widget.ImageView
 import androidx.annotation.MainThread
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
 import life.sabujak.pickle.R
@@ -252,7 +253,7 @@ class CropLayout @JvmOverloads constructor(
 
     fun setPickleMedia(item: PickleItem) {
         this.item = item
-        Glide.with(this.context).load(this.item?.uri).into(cropImageView)
+        Glide.with(this.context).load(this.item?.uri).transition(DrawableTransitionOptions.withCrossFade()).into(cropImageView)
     }
 
     fun clear() {
