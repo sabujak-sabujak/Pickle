@@ -7,5 +7,6 @@ class Video(
     dateAdded: Long,
     fileSize: Long,
     mediaType: Int,
-    mimeType: String
+    mimeType: String,
+    val duration: Long
 ) : Media(id, bucketId, data, dateAdded, fileSize, mediaType, mimeType)

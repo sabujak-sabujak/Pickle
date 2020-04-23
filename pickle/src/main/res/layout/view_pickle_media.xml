@@ -16,7 +16,6 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:onClick="@{v->item.toggle()}"
         android:orientation="vertical">
 
         <ImageView
@@ -46,7 +45,6 @@
             android:layout_width="12dp"
             android:layout_height="12dp"
             android:src="@drawable/ic_check_white_24dp"
-            android:visibility="@{item.checked?View.VISIBLE:View.GONE}"
             app:layout_constraintBottom_toBottomOf="@id/bg_checked"
             app:layout_constraintEnd_toEndOf="@id/bg_checked"
             app:layout_constraintStart_toStartOf="@id/bg_checked"

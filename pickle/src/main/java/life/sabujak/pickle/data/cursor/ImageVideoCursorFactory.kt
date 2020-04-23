@@ -1,19 +1,20 @@
-package life.sabujak.pickle.util
+package life.sabujak.pickle.data.cursor
 
 import android.content.Context
 import android.database.Cursor
+import android.net.Uri
 import android.provider.MediaStore
-import life.sabujak.pickle.data.PickleDataSource
+import life.sabujak.pickle.util.Logger
+import kotlin.system.measureTimeMillis
 
-class PhotoVideoCursor(context:Context):PickleCursor(context){
-    override fun getCursor(): Cursor? {
 
-        var time = System.currentTimeMillis()
+class ImageVideoCursorFactory : CursorFactory {
+    private val logger = Logger.getLogger(ImageVideoCursorFactory::class)
 
+    override fun create(context: Context): Cursor? {
         val projection = arrayOf(
             MediaStore.Files.FileColumns._ID,
             MediaStore.Files.FileColumns.BUCKET_ID,
-            MediaStore.Files.FileColumns.DATA,
             MediaStore.Files.FileColumns.MEDIA_TYPE,
             MediaStore.Files.FileColumns.DATE_ADDED,
             MediaStore.Files.FileColumns.SIZE,
@@ -33,11 +34,20 @@ class PhotoVideoCursor(context:Context):PickleCursor(context){
         )
 
         val sortOrder = String.format("%s %s", MediaStore.MediaColumns.DATE_ADDED, "desc")
-
-        val cursor = context.contentResolver.query(PickleDataSource.uri, projection, selection, selectionArgs, sortOrder)!!
-        logger.d("query time = ${System.currentTimeMillis()-time}")
-        logger.d("cursor size = ${cursor.count}")
-
+        var cursor : Cursor? = null
+        val queryTime = measureTimeMillis {
+            cursor = context.contentResolver.query(
+                getContentUri(),
+                projection,
+                selection,
+                selectionArgs,
+                sortOrder
+            )
+        }
+        logger.d("queryTime = $queryTime")
         return cursor
     }
+
+    override fun getContentUri(): Uri = MediaStore.Files.getContentUri(MediaStore.VOLUME_EXTERNAL)
+
 }

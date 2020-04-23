@@ -252,7 +252,7 @@ class CropLayout @JvmOverloads constructor(
 
     fun setPickleMedia(item: PickleItem) {
         this.item = item
-        Glide.with(this.context).load(this.item?.uri).into(cropImageView)
+        Glide.with(this.context).load(this.item?.mediaUri).into(cropImageView)
     }
 
     fun clear() {
