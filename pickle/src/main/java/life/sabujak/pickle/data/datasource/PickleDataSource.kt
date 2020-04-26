@@ -1,4 +1,4 @@
-package life.sabujak.pickle.data
+package life.sabujak.pickle.data.datasource
 
 import android.annotation.SuppressLint
 import android.content.ContentUris
@@ -7,39 +7,30 @@ import android.database.Cursor
 import android.provider.MediaStore
 import androidx.lifecycle.MutableLiveData
 import androidx.paging.PositionalDataSource
+import life.sabujak.pickle.data.cursor.CursorFactory
 import life.sabujak.pickle.data.entity.Image
 import life.sabujak.pickle.data.entity.PickleItem
 import life.sabujak.pickle.data.entity.Video
-import life.sabujak.pickle.ui.Checkable
-import life.sabujak.pickle.util.CursorFactory
 import life.sabujak.pickle.util.DataSourceState
 import life.sabujak.pickle.util.Logger
-import life.sabujak.pickle.util.PhotoVideoCursor
 
 /**
- * Last query time 660ms for 180,185(Images and Videos)
+ * Last measured query time 660ms for 180,185(Images and Videos)
  */
 class PickleDataSource(
-    private val context: Context,
-    private val checkable: Checkable,
-    private val handler: PickleItem.Handler
+    context: Context,
+    private val cursorFactory: CursorFactory
 ) : PositionalDataSource<PickleItem>() {
-    val logger = Logger.getLogger(PickleDataSource::class.java.simpleName)
-    var cursor: Cursor? = null
-
-    companion object {
-        val uri = MediaStore.Files.getContentUri(MediaStore.VOLUME_EXTERNAL)
-    }
-
-    val initialLoad = MutableLiveData<DataSourceState>()
-    val dataSourceState = MutableLiveData<DataSourceState>()
+    private val logger = Logger.getLogger(PickleDataSource::class.java.simpleName)
+    private var cursor = cursorFactory.create(context)
+    private val initialLoad = MutableLiveData<DataSourceState>()
+    private val dataSourceState = MutableLiveData<DataSourceState>()
 
     override fun loadInitial(
         params: LoadInitialParams,
         callback: LoadInitialCallback<PickleItem>
     ) {
         initialLoad.postValue(DataSourceState.LOADING)
-        cursor = CursorFactory(context).getCursor(PhotoVideoCursor::class)
         cursor?.let {
             if (it.count == 0) {
                 return
@@ -79,34 +70,42 @@ class PickleDataSource(
     @SuppressLint("InlinedApi")
     private fun makePickleMedia(cursor: Cursor): PickleItem {
         val id = cursor.getLong(cursor.getColumnIndex(MediaStore.Files.FileColumns._ID))
-        val bucketId = cursor.getString(cursor.getColumnIndex(MediaStore.Files.FileColumns.BUCKET_ID))
-        val data = cursor.getString(cursor.getColumnIndex(MediaStore.Files.FileColumns.DATA))
+        val bucketId =
+            cursor.getString(cursor.getColumnIndex(MediaStore.Files.FileColumns.BUCKET_ID))
         val dateAdded = cursor.getLong(cursor.getColumnIndex(MediaStore.Video.Media.DATE_ADDED))
         val fileSize = cursor.getLong(cursor.getColumnIndex(MediaStore.Files.FileColumns.SIZE))
         val mediaType =
             cursor.getInt(cursor.getColumnIndex(MediaStore.Files.FileColumns.MEDIA_TYPE))
         val mimeType =
             cursor.getString(cursor.getColumnIndex(MediaStore.Files.FileColumns.MIME_TYPE))
-
-        val contentUri = ContentUris.withAppendedId(uri, id)
         val isVideo = MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO == mediaType
-        logger.d("id = $id bucketId = $bucketId contentUri = $contentUri data = $data mediaType = $mediaType isVideo = $isVideo dateAdded = $dateAdded fileSize = $fileSize mimeType = $mimeType")
+        logger.d("id = $id bucketId = $bucketId mediaType = $mediaType isVideo = $isVideo dateAdded = $dateAdded fileSize = $fileSize mimeType = $mimeType")
+        val uri = ContentUris.withAppendedId(cursorFactory.getContentUri(), id)
+
         return if (isVideo) {
             val duration =
                 cursor.getLong(cursor.getColumnIndex(MediaStore.Video.VideoColumns.DURATION))
-            PickleItem(Video(id, bucketId, data, dateAdded, fileSize, mediaType, mimeType), checkable, handler)
+            PickleItem(
+                Video(id, uri, bucketId, dateAdded, fileSize, mediaType, mimeType, duration),
+                cursorFactory.getContentUri()
+            )
         } else {
-            PickleItem(Image(id, bucketId, data, dateAdded, fileSize, mediaType, mimeType), checkable, handler)
+            PickleItem(
+                Image(id, uri, bucketId, dateAdded, fileSize, mediaType, mimeType),
+                cursorFactory.getContentUri()
+            )
         }
+
     }
 
-    fun closeCursor() {
+    override fun invalidate() {
+        super.invalidate()
         cursor?.let {
-            if (!it.isClosed) {
+            if (it.isClosed) {
                 it.close()
             }
         }
-    }
 
+    }
 
 }

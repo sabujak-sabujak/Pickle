@@ -146,12 +146,6 @@ class InstaFragment constructor() : Fragment(), OnInstaEventListener {
             instaViewModel.setAspectRatio(it)
             instaTopViewModel.setCountable(it)
         })
-        instaViewModel.initialLoadState.observe(viewLifecycleOwner, Observer {
-            logger.d("initialLoadState = $it")
-        })
-        instaViewModel.dataSourceState.observe(viewLifecycleOwner, Observer {
-            logger.d("dataSourceState = $it")
-        })
 
         instaTopViewModel.clickEvent.observe(viewLifecycleOwner, Observer {
             activity?.let {

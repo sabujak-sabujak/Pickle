@@ -1,6 +1,7 @@
 package life.sabujak.pickle.util
 
 import android.util.Log
+import kotlin.reflect.KClass
 
 class Logger constructor(val tag: String? = "Pickle") {
 
@@ -8,6 +9,10 @@ class Logger constructor(val tag: String? = "Pickle") {
         @JvmStatic
         fun getLogger(tag:String):Logger{
             return Logger(tag)
+        }
+
+        fun getLogger(tag: KClass<*>): Logger {
+            return Logger(tag.simpleName)
         }
     }
 

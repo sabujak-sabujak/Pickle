@@ -34,13 +34,10 @@ class InstaSelectionManager : BaseObservable(), Checkable {
         notifyChange()
     }
 
-    private fun isMultiSelect(): Boolean? {
-        return isMultiSelect.value
-    }
+    private fun isMultiSelect() =  isMultiSelect.value
 
-    private fun isCropSelect(): Boolean?{
-        return isCrop.value
-    }
+    private fun isCropSelect() =  isCrop.value
+
 
     override fun setChecked(id: Long, checked: Boolean) {
         if (checked) {

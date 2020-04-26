@@ -5,14 +5,19 @@ import androidx.lifecycle.*
 import androidx.paging.LivePagedListBuilder
 import androidx.paging.PagedList
 import life.sabujak.pickle.Config
-import life.sabujak.pickle.data.PickleDataSourceFactory
+import life.sabujak.pickle.data.cursor.CursorFactory
+import life.sabujak.pickle.data.cursor.CursorType
+import life.sabujak.pickle.data.cursor.PickleCursorFactory
+import life.sabujak.pickle.data.datasource.PickleDataSourceFactory
 import life.sabujak.pickle.data.entity.Media
 import life.sabujak.pickle.data.entity.PickleItem
 import life.sabujak.pickle.data.entity.PickleResult
 import life.sabujak.pickle.util.Logger
 import java.util.ArrayList
 
-class InstaViewModel(application: Application) : AndroidViewModel(application),PickleItem.Handler {
+class InstaViewModel(application: Application) : AndroidViewModel(application)
+//    , PickleItem.Handler
+{
 
     val logger = Logger.getLogger(this.javaClass.simpleName)
 
@@ -26,27 +31,16 @@ class InstaViewModel(application: Application) : AndroidViewModel(application),P
     val selectionManager = InstaSelectionManager()
 
     private val dataSourceFactory by lazy {
-        PickleDataSourceFactory(application, selectionManager, this)
+        PickleDataSourceFactory(
+            application,
+            PickleCursorFactory(CursorType.IMAGE_AND_VIDEO)
+        )
     }
     val items: LiveData<PagedList<PickleItem>> =
         LivePagedListBuilder(dataSourceFactory, 50).build()
 
-    val initialLoadState =
-        Transformations.switchMap(dataSourceFactory.liveDataSource) { it.initialLoad }
-    val dataSourceState =
-        Transformations.switchMap(dataSourceFactory.liveDataSource) { it.dataSourceState }
-
     init {
-        dataSourceFactory.liveDataSource
-    }
-
-    fun invalidateDataSource() {
-        dataSourceFactory.invalidate()
-    }
-
-    override fun onCleared() {
-        super.onCleared()
-        dataSourceFactory.closeCursor()
+        dataSourceFactory.currentDataSource
     }
 
     fun ratioClicked() {

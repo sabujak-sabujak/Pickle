@@ -6,6 +6,7 @@ import android.graphics.Rect
 import android.graphics.RectF
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
+import android.graphics.drawable.TransitionDrawable
 import android.util.AttributeSet
 import android.view.Gravity
 import android.view.View
@@ -15,6 +16,7 @@ import android.view.ViewTreeObserver
 import android.widget.FrameLayout
 import android.widget.ImageView
 import androidx.annotation.MainThread
+import androidx.core.graphics.drawable.toBitmap
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.bumptech.glide.request.target.CustomTarget
@@ -157,10 +159,12 @@ class CropLayout @JvmOverloads constructor(
             logger.d("Image is off of the frame.")
             return
         }
-        val source = (cropImageView.drawable as BitmapDrawable).bitmap
+        val source = cropImageView.drawable.toBitmap()
+//        val source = (cropImageView.drawable as TransitionDrawable).bitmap
         frameCache?.let{
             getCropData()?.let{
                 try{
+//                    Glide.with(context).load(source)
                     Glide.with(context).asBitmap().load(source)
                         .transform(CropTransformation(it)).into(object : CustomTarget<Bitmap>() {
                             override fun onResourceReady(
@@ -253,7 +257,7 @@ class CropLayout @JvmOverloads constructor(
 
     fun setPickleMedia(item: PickleItem) {
         this.item = item
-        Glide.with(this.context).load(this.item?.uri).transition(DrawableTransitionOptions.withCrossFade()).into(cropImageView)
+        Glide.with(this.context).load(this.item?.mediaUri).transition(DrawableTransitionOptions.withCrossFade()).into(cropImageView)
     }
 
     fun clear() {

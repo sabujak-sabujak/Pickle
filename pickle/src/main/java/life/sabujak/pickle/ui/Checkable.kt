@@ -1,5 +1,7 @@
 package life.sabujak.pickle.ui
 
+import androidx.databinding.Observable
+
 
 interface Checkable {
     fun isChecked(id: Long): Boolean
