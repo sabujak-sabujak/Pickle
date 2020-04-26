@@ -4,6 +4,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import life.sabujak.pickle.data.entity.Media
 import life.sabujak.picklesample.databinding.ItemViewBinding
 
@@ -33,7 +34,7 @@ class RvAdapter(private val mediaItems: ArrayList<Media>) : RecyclerView.Adapter
     class ViewHolder(private val binding: ItemViewBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(item: Media) {
-            binding.imageView.setImageURI(item.uri)
+            Glide.with(binding.imageView).load(item.uri).into(binding.imageView)
         }
     }
 }
