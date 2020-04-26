@@ -151,12 +151,6 @@ class InstaFragment constructor() : Fragment(), OnInstaEventListener {
             else binding.ivRatio.visibility = VISIBLE
             instaViewModel.setAspectRatio(it)
         })
-        instaViewModel.initialLoadState.observe(viewLifecycleOwner, Observer {
-            logger.d("initialLoadState = $it")
-        })
-        instaViewModel.dataSourceState.observe(viewLifecycleOwner, Observer {
-            logger.d("dataSourceState = $it")
-        })
 
         optionMenuViewModel.clickEvent.observe(viewLifecycleOwner, Observer {
             activity?.let {

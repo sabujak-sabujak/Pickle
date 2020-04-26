@@ -11,7 +11,7 @@
 
         <variable
             name="viewModel"
-            type="life.sabujak.pickle.ui.common.PickleViewModel" />
+            type="life.sabujak.pickle.ui.dialog.PickleViewModel" />
     </data>
 
     <LinearLayout

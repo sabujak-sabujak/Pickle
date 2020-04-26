@@ -18,7 +18,6 @@ import dagger.android.AndroidInjector
 import life.sabujak.pickle.Config
 import life.sabujak.pickle.R
 import life.sabujak.pickle.databinding.DialogPickleBinding
-import life.sabujak.pickle.ui.common.PickleViewModel
 import life.sabujak.pickle.util.GridSpaceDecoration
 import life.sabujak.pickle.util.Logger
 import javax.inject.Inject
@@ -99,11 +98,12 @@ class PickleDialogFragment constructor() : DaggerPickleFragment() {
         binding.lifecycleOwner = viewLifecycleOwner
         binding.topBarViewModel = topBarViewModel
         binding.viewModel = viewModel
+        adapter.selectionManager = viewModel.selectionManager
         binding.recyclerView.adapter = adapter
         binding.recyclerView.layoutManager = layoutManager.get()
         binding.recyclerView.addItemDecoration(decoration)
         viewModel.items.observe(viewLifecycleOwner, Observer { adapter.submitList(it) })
-        viewModel.selectionManager.count.observe(
+        viewModel.selectionManager.getCount().observe(
             viewLifecycleOwner,
             Observer { topBarViewModel.count.value = if (it == 0) "" else it.toString() })
         topBarViewModel.doneEvent.observe(viewLifecycleOwner, Observer {

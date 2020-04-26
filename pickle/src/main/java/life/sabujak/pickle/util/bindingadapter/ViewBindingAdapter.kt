@@ -14,3 +14,8 @@ fun setLayoutParams(view: View, width: Int?, height: Int?) {
     }
     view.layoutParams = layoutParams
 }
+
+@BindingAdapter(value = ["visible"])
+fun setVisible(view: View, visible: Boolean?) {
+    view.visibility = if(visible == true) View.VISIBLE else View.GONE
+}
