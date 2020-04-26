@@ -1,12 +1,13 @@
 package life.sabujak.pickle.data.datasource
 
 import android.annotation.SuppressLint
+import android.content.ContentUris
 import android.content.Context
 import android.database.Cursor
 import android.provider.MediaStore
 import androidx.lifecycle.MutableLiveData
 import androidx.paging.PositionalDataSource
-import life.sabujak.pickle.data.cursor.ImageVideoCursorFactory
+import life.sabujak.pickle.data.cursor.CursorFactory
 import life.sabujak.pickle.data.entity.Image
 import life.sabujak.pickle.data.entity.PickleItem
 import life.sabujak.pickle.data.entity.Video
@@ -14,11 +15,13 @@ import life.sabujak.pickle.util.DataSourceState
 import life.sabujak.pickle.util.Logger
 
 /**
- * Last query time 660ms for 180,185(Images and Videos)
+ * Last measured query time 660ms for 180,185(Images and Videos)
  */
-class ImageVideoDataSource(context: Context) : PositionalDataSource<PickleItem>() {
-    private val logger = Logger.getLogger(ImageVideoDataSource::class.java.simpleName)
-    private var cursorFactory = ImageVideoCursorFactory()
+class PickleDataSource(
+    context: Context,
+    private val cursorFactory: CursorFactory
+) : PositionalDataSource<PickleItem>() {
+    private val logger = Logger.getLogger(PickleDataSource::class.java.simpleName)
     private var cursor = cursorFactory.create(context)
     private val initialLoad = MutableLiveData<DataSourceState>()
     private val dataSourceState = MutableLiveData<DataSourceState>()
@@ -69,7 +72,6 @@ class ImageVideoDataSource(context: Context) : PositionalDataSource<PickleItem>(
         val id = cursor.getLong(cursor.getColumnIndex(MediaStore.Files.FileColumns._ID))
         val bucketId =
             cursor.getString(cursor.getColumnIndex(MediaStore.Files.FileColumns.BUCKET_ID))
-        val data = cursor.getString(cursor.getColumnIndex(MediaStore.Files.FileColumns.DATA))
         val dateAdded = cursor.getLong(cursor.getColumnIndex(MediaStore.Video.Media.DATE_ADDED))
         val fileSize = cursor.getLong(cursor.getColumnIndex(MediaStore.Files.FileColumns.SIZE))
         val mediaType =
@@ -77,19 +79,31 @@ class ImageVideoDataSource(context: Context) : PositionalDataSource<PickleItem>(
         val mimeType =
             cursor.getString(cursor.getColumnIndex(MediaStore.Files.FileColumns.MIME_TYPE))
         val isVideo = MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO == mediaType
-        logger.d("id = $id bucketId = $bucketId data = $data mediaType = $mediaType isVideo = $isVideo dateAdded = $dateAdded fileSize = $fileSize mimeType = $mimeType")
+        logger.d("id = $id bucketId = $bucketId mediaType = $mediaType isVideo = $isVideo dateAdded = $dateAdded fileSize = $fileSize mimeType = $mimeType")
+        val uri = ContentUris.withAppendedId(cursorFactory.getContentUri(), id)
+
         return if (isVideo) {
             val duration =
                 cursor.getLong(cursor.getColumnIndex(MediaStore.Video.VideoColumns.DURATION))
             PickleItem(
-                Video(id, bucketId, data, dateAdded, fileSize, mediaType, mimeType, duration),
+                Video(id, uri, bucketId, dateAdded, fileSize, mediaType, mimeType, duration),
                 cursorFactory.getContentUri()
             )
         } else {
             PickleItem(
-                Image(id, bucketId, data, dateAdded, fileSize, mediaType, mimeType),
+                Image(id, uri, bucketId, dateAdded, fileSize, mediaType, mimeType),
                 cursorFactory.getContentUri()
             )
+        }
+
+    }
+
+    override fun invalidate() {
+        super.invalidate()
+        cursor?.let {
+            if (it.isClosed) {
+                it.close()
+            }
         }
 
     }

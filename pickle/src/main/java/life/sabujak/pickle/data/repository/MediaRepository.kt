@@ -6,5 +6,5 @@ import life.sabujak.pickle.data.cursor.CursorType
 import life.sabujak.pickle.data.entity.PickleItem
 
 interface MediaRepository {
-    fun createPickleItemList(cursorType: CursorType): LiveData<PagedList<PickleItem>>
+    fun queryMediaList(): LiveData<PagedList<PickleItem>>
 }

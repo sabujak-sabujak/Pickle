@@ -8,11 +8,12 @@ import life.sabujak.pickle.BR
 import life.sabujak.pickle.R
 import life.sabujak.pickle.data.entity.Media
 import life.sabujak.pickle.data.entity.PickleItem
+import life.sabujak.pickle.databinding.ViewInstaMediaBinding
 import life.sabujak.pickle.ui.common.BindingHolder
 import life.sabujak.pickle.ui.common.adapter.PickleBindingComponent
 import life.sabujak.pickle.util.Logger
 
-class InstaAdapter(val lifecycle: Lifecycle, val selectionManager:InstaSelectionManager, val onEventListener: OnInstaEventListener ) : PagedListAdapter<PickleItem, BindingHolder>(diffCallback) {
+class InstaAdapter(val lifecycle: Lifecycle, val selectionManager:InstaSelectionManager, val onEventListener: OnInstaEventListener ) : PagedListAdapter<PickleItem, BindingHolder<ViewInstaMediaBinding>>(diffCallback) {
 
     val logger = Logger.getLogger(this.javaClass.simpleName)
 
@@ -43,17 +44,22 @@ class InstaAdapter(val lifecycle: Lifecycle, val selectionManager:InstaSelection
         return R.layout.view_insta_media
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BindingHolder {
-        return BindingHolder(parent, viewType, PickleBindingComponent(lifecycle))
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BindingHolder<ViewInstaMediaBinding> {
+        return object:BindingHolder<ViewInstaMediaBinding>(parent, viewType, PickleBindingComponent(lifecycle)){
+            override fun bind(holder: BindingHolder<ViewInstaMediaBinding>, position: Int) {
+                val item = getItem(position)
+                item?.let {
+                    holder.binding.setVariable(BR.item, it)
+                    holder.binding.setVariable(BR.instaSelectionManager, selectionManager)
+                    holder.binding.setVariable(BR.onEventListener, onEventListener)
+                    holder.binding.executePendingBindings()
+                }
+            }
+        }
     }
 
-    override fun onBindViewHolder(holder: BindingHolder, position: Int) {
-        val item = getItem(position)
-        item?.let {
-            holder.binding.setVariable(BR.item, it)
-            holder.binding.setVariable(BR.instaSelectionManager, selectionManager)
-            holder.binding.setVariable(BR.onEventListener, onEventListener)
-            holder.binding.executePendingBindings()
-        }
+    override fun onBindViewHolder(holder: BindingHolder<ViewInstaMediaBinding>, position: Int) {
+        holder.bind(holder, position)
+
     }
 }

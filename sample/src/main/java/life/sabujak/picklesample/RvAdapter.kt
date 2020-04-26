@@ -33,9 +33,7 @@ class RvAdapter(private val mediaItems: ArrayList<Media>) : RecyclerView.Adapter
     class ViewHolder(private val binding: ItemViewBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(item: Media) {
-            binding.apply {
-                resultItem = item
-            }
+            binding.imageView.setImageURI(item.uri)
         }
     }
 }

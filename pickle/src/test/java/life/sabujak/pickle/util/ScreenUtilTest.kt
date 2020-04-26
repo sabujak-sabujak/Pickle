@@ -1,9 +1,8 @@
-package life.sabujak.pickle
+package life.sabujak.pickle.util
 
 import android.content.Context
-import androidx.paging.PagedList
 import androidx.test.core.app.ApplicationProvider
-import life.sabujak.pickle.util.ScreenUtil
+import life.sabujak.pickle.R
 import org.junit.Assert
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -13,7 +12,7 @@ import kotlin.random.Random
 
 @RunWith(RobolectricTestRunner::class)
 @Config(qualifiers = "xxxhdpi")
-class ScreenUtilUnitTest {
+class ScreenUtilTest {
     private val context = ApplicationProvider.getApplicationContext<Context>()
 
     @Test
@@ -34,7 +33,9 @@ class ScreenUtilUnitTest {
          * 120dp = 120 * 4 px = 480px
          * 1280 / 480 = 2.66
          */
-        Assert.assertEquals(ScreenUtil.getColumnCount(context, R.dimen.pickle_column_width), (2.66f).toInt()) // 2)
+        Assert.assertEquals(ScreenUtil.getColumnCount(context,
+            R.dimen.pickle_column_width
+        ), (2.66f).toInt()) // 2)
     }
 
 }

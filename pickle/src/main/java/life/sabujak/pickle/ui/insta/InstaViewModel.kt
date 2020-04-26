@@ -5,7 +5,9 @@ import androidx.lifecycle.*
 import androidx.paging.LivePagedListBuilder
 import androidx.paging.PagedList
 import life.sabujak.pickle.Config
+import life.sabujak.pickle.data.cursor.CursorFactory
 import life.sabujak.pickle.data.cursor.CursorType
+import life.sabujak.pickle.data.cursor.PickleCursorFactory
 import life.sabujak.pickle.data.datasource.PickleDataSourceFactory
 import life.sabujak.pickle.data.entity.Media
 import life.sabujak.pickle.data.entity.PickleItem
@@ -31,7 +33,7 @@ class InstaViewModel(application: Application) : AndroidViewModel(application)
     private val dataSourceFactory by lazy {
         PickleDataSourceFactory(
             application,
-            CursorType.IMAGE_AND_VIDEO
+            PickleCursorFactory(CursorType.IMAGE_AND_VIDEO)
         )
     }
     val items: LiveData<PagedList<PickleItem>> =

@@ -7,7 +7,6 @@ import dagger.Module
 import dagger.Provides
 import life.sabujak.pickle.R
 import life.sabujak.pickle.dagger.PickleScope
-import life.sabujak.pickle.ui.common.SelectionManager
 import life.sabujak.pickle.util.GridSpaceDecoration
 import life.sabujak.pickle.util.ScreenUtil
 import javax.inject.Named

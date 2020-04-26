@@ -6,12 +6,15 @@ import androidx.recyclerview.widget.DiffUtil
 import life.sabujak.pickle.BR
 import life.sabujak.pickle.R
 import life.sabujak.pickle.data.entity.PickleItem
+import life.sabujak.pickle.databinding.ViewPickleMediaBinding
 import life.sabujak.pickle.ui.common.BindingHolder
 import life.sabujak.pickle.util.Logger
 import javax.inject.Inject
 
-class PickleDialogAdapter @Inject constructor() : PagedListAdapter<PickleItem, BindingHolder>(diffCallback) {
+class PickleDialogAdapter @Inject constructor() :
+    PagedListAdapter<PickleItem, BindingHolder<ViewPickleMediaBinding>>(diffCallback) {
 
+    var selectionManager: SelectionManager? = null
     val logger = Logger.getLogger(this::class.java.simpleName)
 
     companion object {
@@ -41,13 +44,28 @@ class PickleDialogAdapter @Inject constructor() : PagedListAdapter<PickleItem, B
         return R.layout.view_pickle_media
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BindingHolder {
-        return BindingHolder(parent, viewType)
+    override fun onCreateViewHolder(
+        parent: ViewGroup,
+        viewType: Int
+    ): BindingHolder<ViewPickleMediaBinding> {
+        return object : BindingHolder<ViewPickleMediaBinding>(parent, viewType) {
+
+            override fun bind(holder: BindingHolder<ViewPickleMediaBinding>, position: Int) {
+                val item = getItem(position)
+
+                item?.let { item ->
+                    holder.binding.item = item
+                    holder.binding.selectionManager = selectionManager
+                    holder.binding.executePendingBindings()
+                }
+
+            }
+        }
     }
 
-    override fun onBindViewHolder(holder: BindingHolder, position: Int) {
-        holder.binding.setVariable(BR.item, getItem(position))
-        holder.binding.executePendingBindings()
+    override fun onBindViewHolder(holder: BindingHolder<ViewPickleMediaBinding>, position: Int) {
+        holder.bind(holder, position)
     }
+
 
 }

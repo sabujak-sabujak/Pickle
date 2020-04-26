@@ -1,11 +1,13 @@
 package life.sabujak.pickle.data.entity
 
+import android.net.Uri
+
 class Image(
     id: Long,
+    uri:Uri,
     bucketId: String,
-    data: String,
     dateAdded: Long,
     fileSize: Long,
     mediaType: Int,
     mimeType: String
-) : Media(id, bucketId, data, dateAdded, fileSize, mediaType, mimeType)
+) : Media(id, uri, bucketId, dateAdded, fileSize, mediaType, mimeType)

@@ -11,6 +11,10 @@
             name="item"
             type="life.sabujak.pickle.data.entity.PickleItem" />
 
+        <variable
+            name="selectionManager"
+            type="life.sabujak.pickle.ui.dialog.SelectionManager" />
+
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -22,6 +26,7 @@
             android:id="@+id/image"
             android:layout_width="0dp"
             android:layout_height="0dp"
+            android:onClick="@{v->selectionManager.toggle(item.id)}"
             android:scaleType="centerCrop"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintDimensionRatio="1:1"
@@ -36,9 +41,10 @@
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:layout_margin="8dp"
-            android:src="@drawable/ic_item_selection_off"
+            android:src="@{selectionManager.isChecked(item.id)? @drawable/ic_item_selection_on:@drawable/ic_item_selection_off}"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            app:tint="@color/design_default_color_primary" />
 
         <ImageView
             android:id="@+id/checked"
@@ -48,7 +54,8 @@
             app:layout_constraintBottom_toBottomOf="@id/bg_checked"
             app:layout_constraintEnd_toEndOf="@id/bg_checked"
             app:layout_constraintStart_toStartOf="@id/bg_checked"
-            app:layout_constraintTop_toTopOf="@id/bg_checked" />
+            app:layout_constraintTop_toTopOf="@id/bg_checked"
+            app:visible="@{selectionManager.isChecked(item.id)}" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

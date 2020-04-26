@@ -5,13 +5,23 @@ import android.database.Cursor
 import android.net.Uri
 import android.provider.MediaStore
 import life.sabujak.pickle.util.Logger
+import java.lang.IllegalArgumentException
 import kotlin.system.measureTimeMillis
 
 
-class ImageVideoCursorFactory : CursorFactory {
-    private val logger = Logger.getLogger(ImageVideoCursorFactory::class)
+class PickleCursorFactory(private val cursorType: CursorType) : CursorFactory {
+    private val logger = Logger.getLogger(PickleCursorFactory::class)
 
     override fun create(context: Context): Cursor? {
+        return when (cursorType) {
+            CursorType.IMAGE_AND_VIDEO -> createImageVideoCursor(context)
+            else -> throw IllegalArgumentException("Unknown cursorType, ${cursorType.name}")
+        }
+    }
+
+    override fun getContentUri(): Uri = MediaStore.Files.getContentUri(MediaStore.VOLUME_EXTERNAL)
+
+    private fun createImageVideoCursor(context:Context): Cursor? {
         val projection = arrayOf(
             MediaStore.Files.FileColumns._ID,
             MediaStore.Files.FileColumns.BUCKET_ID,
@@ -34,7 +44,7 @@ class ImageVideoCursorFactory : CursorFactory {
         )
 
         val sortOrder = String.format("%s %s", MediaStore.MediaColumns.DATE_ADDED, "desc")
-        var cursor : Cursor? = null
+        var cursor: Cursor? = null
         val queryTime = measureTimeMillis {
             cursor = context.contentResolver.query(
                 getContentUri(),
@@ -47,7 +57,5 @@ class ImageVideoCursorFactory : CursorFactory {
         logger.d("queryTime = $queryTime")
         return cursor
     }
-
-    override fun getContentUri(): Uri = MediaStore.Files.getContentUri(MediaStore.VOLUME_EXTERNAL)
 
 }
