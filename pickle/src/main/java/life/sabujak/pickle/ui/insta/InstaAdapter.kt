@@ -13,7 +13,8 @@ import life.sabujak.pickle.ui.common.BindingHolder
 import life.sabujak.pickle.ui.common.adapter.PickleBindingComponent
 import life.sabujak.pickle.util.Logger
 
-class InstaAdapter(val lifecycle: Lifecycle, val selectionManager:InstaSelectionManager, val onEventListener: OnInstaEventListener ) : PagedListAdapter<PickleItem, BindingHolder<ViewInstaMediaBinding>>(diffCallback) {
+class InstaAdapter(val lifecycle: Lifecycle, val selectionManager:InstaSelectionManager, val onEventListener: OnInstaEventListener )
+    : PagedListAdapter<PickleItem, BindingHolder<ViewInstaMediaBinding>>(diffCallback) {
 
     val logger = Logger.getLogger(this.javaClass.simpleName)
 

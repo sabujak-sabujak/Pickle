@@ -13,6 +13,6 @@ abstract class Media(
 
 ) {
     override fun toString(): String {
-        return "id = $id, bucketId = $bucketId, dateAdded = $dateAdded, fileSize = $fileSize, mediaType = $mediaType, mimeType = $mimeType"
+        return "id = $id, bucketId = $bucketId, uri = $uri dateAdded = $dateAdded, fileSize = $fileSize, mediaType = $mediaType, mimeType = $mimeType"
     }
 }

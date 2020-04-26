@@ -20,7 +20,7 @@ class InstaSelectionManager : BaseObservable(),
     fun setMultipleSelect(isMultiple: Boolean) {
         logger.d("setMultipleSelect ${isMultiple}")
         isMultiSelect.postValue(isMultiple)
-        clear()
+        setChecked(lastSelected, isMultiple)
     }
 
     override fun isChecked(id: Long): Boolean {
@@ -34,17 +34,14 @@ class InstaSelectionManager : BaseObservable(),
         notifyChange()
     }
 
-    private fun isMultiSelect(): Boolean? {
-        return isMultiSelect.value
-    }
+    private fun isMultiSelect() =  isMultiSelect.value
 
-    private fun isCropSelect(): Boolean?{
-        return isCrop.value
-    }
+    private fun isCropSelect() =  isCrop.value
+
 
     override fun setChecked(id: Long, checked: Boolean) {
         if (checked) {
-            selectionList.put(id, null)
+            selectionList[id] = null
         } else {
             selectionList.remove(id)
         }
@@ -55,7 +52,7 @@ class InstaSelectionManager : BaseObservable(),
 
     private fun setChecked(id: Long, checked: Boolean, cropData: CropData) {
         if (checked) {
-            selectionList.put(id, cropData)
+            selectionList[id] = cropData
         } else {
             selectionList.remove(id)
         }
@@ -88,8 +85,7 @@ class InstaSelectionManager : BaseObservable(),
     }
 
     private fun getIndex(id: Long): Int {
-        val pos = ArrayList<Long>(selectionList.keys).indexOf(id)
-        return pos
+        return ArrayList(selectionList.keys).indexOf(id)
     }
 
     fun getPosition(id: Long): String {
@@ -102,12 +98,13 @@ class InstaSelectionManager : BaseObservable(),
     }
 
     fun setMultiCropData(id: Long = lastSelected, cropData: CropData) {
-        selectionList.put(id, cropData)
+        selectionList[id] = cropData
         logger.d("setMultiCropData : ${id}, ${cropData}")
     }
 
     fun clear() {
         selectionList.clear()
+        updateCount()
         notifyChange()
     }
 

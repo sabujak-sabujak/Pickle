@@ -1,7 +1,6 @@
 package life.sabujak.pickle.ui.insta
 
 import android.graphics.Bitmap
-import android.graphics.drawable.Drawable
 
 /**
  * Listener to return an cropped image.

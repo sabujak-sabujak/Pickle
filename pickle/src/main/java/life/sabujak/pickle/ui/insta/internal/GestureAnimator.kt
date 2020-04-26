@@ -2,7 +2,6 @@ package life.sabujak.pickle.ui.insta.internal
 
 import android.graphics.RectF
 import android.view.View
-import life.sabujak.pickle.util.Logger
 
 /**
  * Animator to move a view horizontally and vertically, and scale a view.
