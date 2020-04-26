@@ -3,50 +3,16 @@ package life.sabujak.pickle.data.cursor
 import android.content.ContentUris
 import android.content.Context
 import android.database.Cursor
-import android.database.MatrixCursor
 import android.net.Uri
 import android.provider.MediaStore
 import life.sabujak.pickle.data.entity.Image
 import life.sabujak.pickle.data.entity.PickleItem
 import life.sabujak.pickle.data.entity.Video
 import life.sabujak.pickle.util.Logger
+import kotlin.system.measureTimeMillis
 
-class FakeCursorFactory : CursorFactory {
-
+class ImageVideoCursorFactory : CursorFactory {
     private val logger = Logger.getLogger(this::class)
-
-
-    val cursor:MatrixCursor = MatrixCursor(getProjection())
-    override fun create(context: Context): Cursor? {
-        return cursor
-    }
-
-    fun setup100Images(){
-        cursor.window?.clear()
-        for (i in 0 until 100) {
-            val id = i.toLong()
-            val bucketId = 0L
-            val mediaType = MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE
-            val dateAdded = System.currentTimeMillis()
-            val size = 100
-            val mimeType = "image/jpeg"
-            val duration = 0
-            val orientation = 0
-            val row =
-                arrayOf(id, bucketId, mediaType, dateAdded, size, mimeType, duration, orientation)
-            cursor.addRow(row)
-        }
-    }
-
-    fun clear() {
-        cursor.window?.clear()
-    }
-
-    fun add(row: Array<out Any>) {
-        cursor.addRow(row)
-    }
-
-    override fun getContentUri(): Uri = MediaStore.Files.getContentUri(MediaStore.VOLUME_EXTERNAL)
     override fun getProjection(): Array<String> {
         return arrayOf(
             MediaStore.Files.FileColumns._ID,
@@ -56,8 +22,40 @@ class FakeCursorFactory : CursorFactory {
             MediaStore.Files.FileColumns.SIZE,
             MediaStore.Files.FileColumns.MIME_TYPE,
             MediaStore.Video.VideoColumns.DURATION,
-            MediaStore.MediaColumns.ORIENTATION
+            MediaStore.Files.FileColumns.ORIENTATION
         )
+    }
+
+    override fun create(context: Context): Cursor? {
+        val projection = getProjection()
+
+        val selection = "" +
+                "${MediaStore.Files.FileColumns.MEDIA_TYPE}=?" +
+                " OR " +
+                "${MediaStore.Files.FileColumns.MEDIA_TYPE}=?"
+
+        val selectionArgs = arrayOf(
+            "${MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE}",
+            "${MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO}"
+        )
+
+        val sortOrder = String.format("%s %s", MediaStore.MediaColumns.DATE_ADDED, "desc")
+        var cursor: Cursor? = null
+        val queryTime = measureTimeMillis {
+            cursor = context.contentResolver.query(
+                getContentUri(),
+                projection,
+                selection,
+                selectionArgs,
+                sortOrder
+            )
+        }
+        logger.d("createImageVideoCursor queryTime = $queryTime")
+        return cursor
+    }
+
+    override fun getContentUri(): Uri {
+        return MediaStore.Files.getContentUri(MediaStore.VOLUME_EXTERNAL)
     }
 
     override fun createPickleItem(cursor: Cursor): PickleItem {

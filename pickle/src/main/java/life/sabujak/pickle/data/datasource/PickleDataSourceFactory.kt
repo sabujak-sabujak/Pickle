@@ -4,8 +4,6 @@ import android.content.Context
 import androidx.lifecycle.MutableLiveData
 import androidx.paging.DataSource
 import life.sabujak.pickle.data.cursor.CursorFactory
-import life.sabujak.pickle.data.cursor.CursorType
-import life.sabujak.pickle.data.cursor.PickleCursorFactory
 import life.sabujak.pickle.data.entity.PickleItem
 
 

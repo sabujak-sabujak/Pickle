@@ -2,11 +2,11 @@ package life.sabujak.pickle.ui.insta
 
 import androidx.databinding.BaseObservable
 import androidx.lifecycle.MutableLiveData
-import life.sabujak.pickle.ui.Checkable
 import life.sabujak.pickle.ui.insta.internal.CropData
 import life.sabujak.pickle.util.Logger
 
-class InstaSelectionManager : BaseObservable(), Checkable {
+class InstaSelectionManager : BaseObservable(),
+    Checkable {
     val logger = Logger.getLogger(this.javaClass.simpleName)
     private var lastSelected: Long = -1
     val selectionList = LinkedHashMap<Long, CropData?>()

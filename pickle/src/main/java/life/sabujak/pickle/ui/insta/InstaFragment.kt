@@ -2,8 +2,6 @@ package life.sabujak.pickle.ui.insta
 
 import android.content.Context
 import android.graphics.Bitmap
-import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.provider.MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE
 import android.view.*
@@ -20,13 +18,11 @@ import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.GridLayoutManager
 import com.bumptech.glide.Glide
 import com.google.android.material.appbar.AppBarLayout
-import life.sabujak.pickle.Config
+import life.sabujak.pickle.ui.dialog.Config
 import life.sabujak.pickle.R
 import life.sabujak.pickle.data.entity.PickleItem
 import life.sabujak.pickle.databinding.FragmentInstaBinding
-import life.sabujak.pickle.ui.common.OnResultListener
 import life.sabujak.pickle.ui.common.OptionMenuViewModel
-import life.sabujak.pickle.ui.dialog.TopBarViewModel
 import life.sabujak.pickle.ui.insta.internal.CropDataListener
 import life.sabujak.pickle.util.Logger
 import life.sabujak.pickle.util.ext.showToast

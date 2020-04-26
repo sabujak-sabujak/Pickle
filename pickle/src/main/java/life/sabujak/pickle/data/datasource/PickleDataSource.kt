@@ -58,7 +58,7 @@ class PickleDataSource(
                 if (!it.moveToNext()) {
                     break
                 }
-                mediaList.add(makePickleMedia(it))
+                mediaList.add(cursorFactory.createPickleItem(it))
             }
             return mediaList
         } ?: run {
@@ -67,36 +67,7 @@ class PickleDataSource(
     }
 
 
-    @SuppressLint("InlinedApi")
-    private fun makePickleMedia(cursor: Cursor): PickleItem {
-        val id = cursor.getLong(cursor.getColumnIndex(MediaStore.Files.FileColumns._ID))
-        val bucketId =
-            cursor.getString(cursor.getColumnIndex(MediaStore.Files.FileColumns.BUCKET_ID))
-        val dateAdded = cursor.getLong(cursor.getColumnIndex(MediaStore.Video.Media.DATE_ADDED))
-        val fileSize = cursor.getLong(cursor.getColumnIndex(MediaStore.Files.FileColumns.SIZE))
-        val mediaType =
-            cursor.getInt(cursor.getColumnIndex(MediaStore.Files.FileColumns.MEDIA_TYPE))
-        val mimeType =
-            cursor.getString(cursor.getColumnIndex(MediaStore.Files.FileColumns.MIME_TYPE))
-        val isVideo = MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO == mediaType
-        logger.d("id = $id bucketId = $bucketId mediaType = $mediaType isVideo = $isVideo dateAdded = $dateAdded fileSize = $fileSize mimeType = $mimeType")
-        val uri = ContentUris.withAppendedId(cursorFactory.getContentUri(), id)
 
-        return if (isVideo) {
-            val duration =
-                cursor.getLong(cursor.getColumnIndex(MediaStore.Video.VideoColumns.DURATION))
-            PickleItem(
-                Video(id, uri, bucketId, dateAdded, fileSize, mediaType, mimeType, duration),
-                cursorFactory.getContentUri()
-            )
-        } else {
-            PickleItem(
-                Image(id, uri, bucketId, dateAdded, fileSize, mediaType, mimeType),
-                cursorFactory.getContentUri()
-            )
-        }
-
-    }
 
     override fun invalidate() {
         super.invalidate()

@@ -3,7 +3,6 @@ package life.sabujak.pickle.ui.dialog
 import androidx.databinding.BaseObservable
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import life.sabujak.pickle.ui.Checkable
 import life.sabujak.pickle.util.Logger
 
 

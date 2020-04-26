@@ -15,7 +15,6 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_EXPANDE
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import dagger.Lazy
 import dagger.android.AndroidInjector
-import life.sabujak.pickle.Config
 import life.sabujak.pickle.R
 import life.sabujak.pickle.databinding.DialogPickleBinding
 import life.sabujak.pickle.util.GridSpaceDecoration
