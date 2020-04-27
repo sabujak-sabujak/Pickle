@@ -1,17 +1,11 @@
 package life.sabujak.pickle.data.datasource
 
-import android.annotation.SuppressLint
-import android.content.ContentUris
 import android.content.Context
 import android.database.Cursor
-import android.provider.MediaStore
 import androidx.lifecycle.MutableLiveData
 import androidx.paging.PositionalDataSource
 import life.sabujak.pickle.data.cursor.CursorFactory
-import life.sabujak.pickle.data.entity.Image
 import life.sabujak.pickle.data.entity.PickleItem
-import life.sabujak.pickle.data.entity.Video
-import life.sabujak.pickle.util.DataSourceState
 import life.sabujak.pickle.util.Logger
 
 /**

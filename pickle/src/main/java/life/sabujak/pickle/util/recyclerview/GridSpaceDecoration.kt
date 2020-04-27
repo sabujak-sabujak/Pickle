@@ -1,4 +1,4 @@
-package life.sabujak.pickle.util
+package life.sabujak.pickle.util.recyclerview
 
 import android.graphics.Rect
 import android.view.View

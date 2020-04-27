@@ -5,7 +5,7 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import life.sabujak.pickle.R
-import life.sabujak.pickle.util.SingleLiveEvent
+import life.sabujak.pickle.util.lifecycle.SingleLiveEvent
 
 class TopBarViewModel(application: Application) : AndroidViewModel(application) {
 

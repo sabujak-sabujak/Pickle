@@ -1,15 +1,10 @@
 package life.sabujak.pickle.ui.insta
 
 import android.app.Application
-import android.view.LayoutInflater
-import android.view.Menu
-import android.view.MenuItem
 import androidx.core.content.ContextCompat
-import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.*
 import life.sabujak.pickle.R
-import life.sabujak.pickle.ui.common.adapter.PickleBindingComponent
-import life.sabujak.pickle.util.SingleLiveEvent
+import life.sabujak.pickle.util.lifecycle.SingleLiveEvent
 
 class InstaTopViewModel(val app: Application) : AndroidViewModel(app) {
 

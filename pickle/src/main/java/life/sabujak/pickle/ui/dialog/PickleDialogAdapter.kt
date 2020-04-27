@@ -3,11 +3,10 @@ package life.sabujak.pickle.ui.dialog
 import android.view.ViewGroup
 import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
-import life.sabujak.pickle.BR
 import life.sabujak.pickle.R
 import life.sabujak.pickle.data.entity.PickleItem
 import life.sabujak.pickle.databinding.ViewPickleMediaBinding
-import life.sabujak.pickle.ui.common.BindingHolder
+import life.sabujak.pickle.util.recyclerview.BindingHolder
 import life.sabujak.pickle.util.Logger
 import javax.inject.Inject
 

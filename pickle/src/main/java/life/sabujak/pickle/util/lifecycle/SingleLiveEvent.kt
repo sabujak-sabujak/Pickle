@@ -1,4 +1,4 @@
-package life.sabujak.pickle.util
+package life.sabujak.pickle.util.lifecycle
 
 import android.util.Log
 import androidx.annotation.MainThread

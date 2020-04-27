@@ -17,7 +17,7 @@ import dagger.Lazy
 import dagger.android.AndroidInjector
 import life.sabujak.pickle.R
 import life.sabujak.pickle.databinding.DialogPickleBinding
-import life.sabujak.pickle.util.GridSpaceDecoration
+import life.sabujak.pickle.util.recyclerview.GridSpaceDecoration
 import life.sabujak.pickle.util.Logger
 import javax.inject.Inject
 

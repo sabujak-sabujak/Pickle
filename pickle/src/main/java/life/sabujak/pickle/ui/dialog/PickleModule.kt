@@ -7,7 +7,7 @@ import dagger.Module
 import dagger.Provides
 import life.sabujak.pickle.R
 import life.sabujak.pickle.dagger.PickleScope
-import life.sabujak.pickle.util.GridSpaceDecoration
+import life.sabujak.pickle.util.recyclerview.GridSpaceDecoration
 import life.sabujak.pickle.util.ScreenUtil
 import javax.inject.Named
 
@@ -38,5 +38,9 @@ class PickleModule {
     @Provides
     @PickleScope
     fun provideGridSpaceDecoration(context: Context, @Named("columnCount") columnCount: Int) =
-        GridSpaceDecoration(columnCount,ScreenUtil.dpToPx(context, 3f), false)
+        GridSpaceDecoration(
+            columnCount,
+            ScreenUtil.dpToPx(context, 3f),
+            false
+        )
 }

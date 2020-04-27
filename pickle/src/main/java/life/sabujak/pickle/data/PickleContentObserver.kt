@@ -9,12 +9,13 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
 import life.sabujak.pickle.util.Logger
-import life.sabujak.pickle.util.SingleLiveEvent
+import life.sabujak.pickle.util.lifecycle.SingleLiveEvent
 
 class PickleContentObserver(val activity:FragmentActivity) : ContentObserver(Handler()), LifecycleObserver{
 
     private val logger = Logger.getLogger(PickleContentObserver::class.java.simpleName)
-    val contentChangedEvent = SingleLiveEvent<Void>()
+    val contentChangedEvent =
+        SingleLiveEvent<Void>()
 
     init {
         activity.lifecycle.addObserver(this)

@@ -1,4 +1,4 @@
-package life.sabujak.pickle.ui.common.adapter
+package life.sabujak.pickle.util.bindingadapter
 
 import android.view.View
 import androidx.databinding.BindingAdapter

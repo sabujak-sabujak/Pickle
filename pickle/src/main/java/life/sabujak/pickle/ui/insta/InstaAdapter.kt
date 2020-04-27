@@ -6,11 +6,10 @@ import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
 import life.sabujak.pickle.BR
 import life.sabujak.pickle.R
-import life.sabujak.pickle.data.entity.Media
 import life.sabujak.pickle.data.entity.PickleItem
 import life.sabujak.pickle.databinding.ViewInstaMediaBinding
-import life.sabujak.pickle.ui.common.BindingHolder
-import life.sabujak.pickle.ui.common.adapter.PickleBindingComponent
+import life.sabujak.pickle.util.recyclerview.BindingHolder
+import life.sabujak.pickle.util.bindingadapter.PickleBindingComponent
 import life.sabujak.pickle.util.Logger
 
 class InstaAdapter(val lifecycle: Lifecycle, val selectionManager:InstaSelectionManager, val onEventListener: OnInstaEventListener )
@@ -46,7 +45,12 @@ class InstaAdapter(val lifecycle: Lifecycle, val selectionManager:InstaSelection
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BindingHolder<ViewInstaMediaBinding> {
-        return object:BindingHolder<ViewInstaMediaBinding>(parent, viewType, PickleBindingComponent(lifecycle)){
+        return object:
+            BindingHolder<ViewInstaMediaBinding>(parent, viewType,
+            PickleBindingComponent(
+                lifecycle
+            )
+        ){
             override fun bind(holder: BindingHolder<ViewInstaMediaBinding>, position: Int) {
                 val item = getItem(position)
                 item?.let {
