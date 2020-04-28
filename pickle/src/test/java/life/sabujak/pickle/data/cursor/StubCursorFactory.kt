@@ -11,12 +11,11 @@ import life.sabujak.pickle.data.entity.PickleItem
 import life.sabujak.pickle.data.entity.Video
 import life.sabujak.pickle.util.Logger
 
-class FakeCursorFactory : CursorFactory {
+class StubCursorFactory : CursorFactory {
 
     private val logger = Logger.getLogger(this::class)
 
-
-    val cursor:MatrixCursor = MatrixCursor(getProjection())
+    private val cursor:MatrixCursor = MatrixCursor(getProjection())
     override fun create(context: Context): Cursor? {
         return cursor
     }
@@ -40,10 +39,6 @@ class FakeCursorFactory : CursorFactory {
 
     fun clear() {
         cursor.window?.clear()
-    }
-
-    fun add(row: Array<out Any>) {
-        cursor.addRow(row)
     }
 
     override fun getContentUri(): Uri = MediaStore.Files.getContentUri(MediaStore.VOLUME_EXTERNAL)

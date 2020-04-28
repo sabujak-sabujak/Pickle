@@ -6,10 +6,6 @@
     <data>
 
         <variable
-            name="topBarViewModel"
-            type="life.sabujak.pickle.ui.dialog.TopBarViewModel" />
-
-        <variable
             name="viewModel"
             type="life.sabujak.pickle.ui.dialog.PickleViewModel" />
     </data>
@@ -22,14 +18,14 @@
 
         <include
             layout="@layout/layout_top_bar"
-            app:viewModel="@{topBarViewModel}" />
+            app:config="@{viewModel.config}"
+            app:viewModel="@{viewModel}" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recycler_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:minHeight="120dp"
-            app:layout_height="@{viewModel.config.maxHeight}"
             />
 
 

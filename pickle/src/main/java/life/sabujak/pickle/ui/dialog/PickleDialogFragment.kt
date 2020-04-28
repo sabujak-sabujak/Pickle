@@ -15,6 +15,7 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_EXPANDE
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import dagger.Lazy
 import dagger.android.AndroidInjector
+import kotlinx.android.synthetic.main.layout_top_bar.view.*
 import life.sabujak.pickle.R
 import life.sabujak.pickle.databinding.DialogPickleBinding
 import life.sabujak.pickle.util.recyclerview.GridSpaceDecoration
@@ -27,7 +28,6 @@ class PickleDialogFragment constructor() : DaggerPickleFragment() {
 
     private lateinit var binding: DialogPickleBinding
     private val viewModel: PickleViewModel by viewModels()
-    private val topBarViewModel: TopBarViewModel by viewModels()
 
     @Inject
     lateinit var adapter: PickleDialogAdapter
@@ -51,9 +51,9 @@ class PickleDialogFragment constructor() : DaggerPickleFragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         if (savedInstanceState == null) {
-            viewModel.config = this.config
+            this.viewModel.config = this.config
         } else {
-            this.config = viewModel.config!!
+            this.config = this.viewModel.config!!
         }
     }
 
@@ -75,7 +75,6 @@ class PickleDialogFragment constructor() : DaggerPickleFragment() {
             val windowManager = context?.getSystemService(WINDOW_SERVICE) as WindowManager
             val rotation = windowManager.defaultDisplay.rotation
 
-            BottomSheetBehavior.from(bottomSheet).peekHeight = config.peekHeight
             when (rotation) {
                 Surface.ROTATION_0 -> {
                     BottomSheetBehavior.from(bottomSheet).state = STATE_COLLAPSED
@@ -95,20 +94,18 @@ class PickleDialogFragment constructor() : DaggerPickleFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.lifecycleOwner = viewLifecycleOwner
-        binding.topBarViewModel = topBarViewModel
         binding.viewModel = viewModel
         adapter.selectionManager = viewModel.selectionManager
         binding.recyclerView.adapter = adapter
         binding.recyclerView.layoutManager = layoutManager.get()
         binding.recyclerView.addItemDecoration(decoration)
         viewModel.items.observe(viewLifecycleOwner, Observer { adapter.submitList(it) })
-        viewModel.selectionManager.getCount().observe(
-            viewLifecycleOwner,
-            Observer { topBarViewModel.count.value = if (it == 0) "" else it.toString() })
-        topBarViewModel.doneEvent.observe(viewLifecycleOwner, Observer {
-            config.onResultListener.onSuccess(viewModel.getPickleResult())
+        viewModel.doneEvent.observe(viewLifecycleOwner, Observer {
+            config.onResultListener?.onSuccess(viewModel.getPickleResult())
             dismiss()
         })
+
+        binding.root.done
     }
 
 }

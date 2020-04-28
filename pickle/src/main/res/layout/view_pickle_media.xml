@@ -43,8 +43,7 @@
             android:layout_margin="8dp"
             android:src="@{selectionManager.isChecked(item.id)? @drawable/ic_item_selection_on:@drawable/ic_item_selection_off}"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:tint="@color/design_default_color_primary" />
+            app:layout_constraintTop_toTopOf="parent" />
 
         <ImageView
             android:id="@+id/checked"

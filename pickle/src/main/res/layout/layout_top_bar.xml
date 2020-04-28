@@ -5,53 +5,63 @@
 
     <data>
 
+        <import type="androidx.core.content.ContextCompat" />
+
         <variable
             name="viewModel"
-            type="life.sabujak.pickle.ui.dialog.TopBarViewModel" />
+            type="life.sabujak.pickle.ui.dialog.PickleViewModel" />
+
+        <variable
+            name="config"
+            type="life.sabujak.pickle.ui.dialog.Config" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@{viewModel.backgroundColor}"
-        android:orientation="horizontal"
+        android:background="@color/WT"
         android:onClick="@{v->viewModel.onDoneClick()}"
+        android:orientation="horizontal"
         android:padding="8dp"
         tools:background="@color/WT">
 
         <TextView
-            android:id="@+id/title"
+            android:id="@+id/topbar_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
-            android:text="@{viewModel.title}"
-            android:textColor="@{viewModel.titleColor}"
+            android:text="@{config.title}"
+            android:textColor="@{ContextCompat.getColor(context,config.themeColorRes)}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            tools:text="Title" />
+            tools:text="Title"
+            tools:textColor="@color/GR500" />
 
         <TextView
+            android:id="@+id/count"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
-            android:text="@{viewModel.count}"
-            android:textColor="@{viewModel.countColor}"
+            android:text="@{String.valueOf(viewModel.selectionManager.count)}"
+            android:textColor="@{ContextCompat.getColor(context,config.themeColorRes)}"
             app:layout_constraintBottom_toBottomOf="@id/done"
             app:layout_constraintEnd_toStartOf="@id/done"
             app:layout_constraintTop_toTopOf="@id/done"
-            tools:text="9999" />
+            tools:text="9999"
+            tools:textColor="@color/GR500" />
 
         <ImageView
             android:id="@+id/done"
             android:layout_width="36dp"
             android:layout_height="36dp"
-            android:src="@{viewModel.doneIcon}"
+            android:src="@drawable/ic_check_white_24dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:tint="@{viewModel.doneIconTintColor}"
-            tools:src="@drawable/ic_check_white_24dp" />
+            app:tint="@{ContextCompat.getColor(context,config.themeColorRes)}"
+            tools:src="@drawable/ic_check_white_24dp"
+            tools:tint="@color/GR500" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </layout>

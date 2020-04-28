@@ -1,4 +1,4 @@
-package life.sabujak.pickle
+package life.sabujak.picklesample
 
 import org.junit.Test
 

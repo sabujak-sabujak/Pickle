@@ -158,7 +158,7 @@ class InstaFragment constructor() : Fragment(), OnInstaEventListener {
                         else binding.ivPreview.crop()
                     }
                     else {
-                        config.onResultListener.onSuccess(instaViewModel.getPickleResult())
+                        config.onResultListener?.onSuccess(instaViewModel.getPickleResult())
                         it.supportFragmentManager.popBackStack()
                     }
                 }

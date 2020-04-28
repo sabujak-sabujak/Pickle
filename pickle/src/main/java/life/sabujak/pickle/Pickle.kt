@@ -16,6 +16,7 @@ object Pickle {
     }
 
     fun start(fragmentManager: FragmentManager, containerId: Int, listener: OnResultListener){
+        //FIXME Insta용 Config 별도로 분리
         fragmentManager.beginTransaction()
             .add(containerId, InstaFragment(Config.Builder(listener).build()),"Insta")
             .addToBackStack(null)
