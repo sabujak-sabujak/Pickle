@@ -4,11 +4,13 @@ import androidx.databinding.BaseObservable
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import life.sabujak.pickle.util.Logger
+import java.util.*
+import kotlin.collections.ArrayList
 
 
 class SelectionManager : BaseObservable() {
     private val logger = Logger.getLogger(SelectionManager::class.java.javaClass.simpleName)
-    val selectedIds = HashSet<Long>()
+    val selectedIds = LinkedList<Long>()
     private val count = MutableLiveData(0)
 
     fun setChecked(id: Long, checked: Boolean) {

@@ -1,2 +1,3 @@
-include ':sample', ':pickle'
+include ':sample_kotlin', ':pickle'
 rootProject.name='PickleSample'
+include ':sample_java'
