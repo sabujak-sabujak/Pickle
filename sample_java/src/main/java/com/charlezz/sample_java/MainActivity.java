@@ -3,6 +3,7 @@ package com.charlezz.sample_java;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -12,8 +13,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.charlezz.sample_java.databinding.ActivityMainBinding;
 
 import life.sabujak.pickle.Pickle;
-import life.sabujak.pickle.data.entity.PickleResult;
-import life.sabujak.pickle.ui.common.OnResultListener;
+import life.sabujak.pickle.data.entity.PickleError;
+import life.sabujak.pickle.ui.dialog.OnResultListener;
+import life.sabujak.pickle.ui.dialog.PickleResult;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -40,8 +42,8 @@ public class MainActivity extends AppCompatActivity {
                             }
 
                             @Override
-                            public void onFailure(Throwable t) {
-
+                            public void onError(PickleError error) {
+                                Toast.makeText(MainActivity.this, error.getErrorCode().name(), Toast.LENGTH_SHORT).show();
                             }
                         });
                         break;

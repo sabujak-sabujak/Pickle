@@ -1,19 +1,16 @@
 package life.sabujak.pickle.ui.dialog
 
-import android.view.ViewGroup
 import androidx.annotation.ColorRes
-import androidx.core.content.ContextCompat
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import life.sabujak.pickle.R
 import life.sabujak.pickle.data.cursor.CursorType
-import life.sabujak.pickle.ui.common.OnResultListener
 
 class Config private constructor(
     val onResultListener: OnResultListener?,
     val cursorType: CursorType,
     @ColorRes val themeColorRes: Int,
-    val title: CharSequence
-
+    val title: CharSequence,
+    val maxSelectionCount : Int
 ) {
 
     class Builder (private var onResultListener: OnResultListener? = null) {
@@ -22,6 +19,7 @@ class Config private constructor(
         @ColorRes
         private var themeColorRes: Int = R.color.GR500
         private var title: CharSequence = "Select images"
+        private var maxSelectionCount : Int = 10
 
         fun setCursorType(cursorType: CursorType) = apply { this.cursorType = cursorType }
         fun setThemeColorRes(@ColorRes themeColorRes: Int) =
@@ -29,11 +27,14 @@ class Config private constructor(
 
         fun setTitle(title: CharSequence) = apply { this.title = title }
 
+        fun setMaxSelectionCount(maxSelectionCount: Int) = apply { this.maxSelectionCount = maxSelectionCount }
+
         fun build() = Config(
-            onResultListener,
-            cursorType,
-            themeColorRes,
-            title
+            onResultListener = onResultListener,
+            cursorType = cursorType,
+            themeColorRes = themeColorRes,
+            title = title,
+            maxSelectionCount = maxSelectionCount
         )
     }
 

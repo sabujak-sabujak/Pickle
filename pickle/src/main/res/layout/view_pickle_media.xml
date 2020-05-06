@@ -26,7 +26,7 @@
             android:id="@+id/image"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:onClick="@{v->selectionManager.toggle(item.id)}"
+            android:onClick="@{v->selectionManager.toggle(item.media)}"
             android:scaleType="centerCrop"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintDimensionRatio="1:1"

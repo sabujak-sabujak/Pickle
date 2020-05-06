@@ -1,13 +1,14 @@
 package life.sabujak.pickle.ui.dialog
 
+import android.app.Application
 import android.app.Dialog
 import android.content.Context.WINDOW_SERVICE
 import android.os.Bundle
 import android.view.*
 import android.widget.FrameLayout
 import androidx.databinding.DataBindingUtil
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_COLLAPSED
@@ -27,7 +28,8 @@ class PickleDialogFragment constructor() : DaggerPickleFragment() {
     private val logger = Logger.getLogger(PickleDialogFragment::javaClass.name)
 
     private lateinit var binding: DialogPickleBinding
-    private val viewModel: PickleViewModel by viewModels()
+    private lateinit var config: Config
+    private lateinit var viewModel: PickleViewModel
 
     @Inject
     lateinit var adapter: PickleDialogAdapter
@@ -37,8 +39,6 @@ class PickleDialogFragment constructor() : DaggerPickleFragment() {
 
     @Inject
     lateinit var decoration: GridSpaceDecoration
-
-    private lateinit var config: Config
 
     override fun fragmentInjector(): AndroidInjector<out PickleDialogFragment> {
         return DaggerPickleDialogComponent.factory().create(this)
@@ -51,9 +51,10 @@ class PickleDialogFragment constructor() : DaggerPickleFragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         if (savedInstanceState == null) {
-            this.viewModel.config = this.config
+            val viewModelFactory = PickleViewModelFactory(requireContext().applicationContext as Application, config)
+            viewModel = ViewModelProvider(this, viewModelFactory).get(PickleViewModel::class.java)
         } else {
-            this.config = this.viewModel.config!!
+            viewModel = ViewModelProvider(this).get(PickleViewModel::class.java)
         }
     }
 
@@ -73,9 +74,7 @@ class PickleDialogFragment constructor() : DaggerPickleFragment() {
             val bottomSheet: FrameLayout = bsd.findViewById(com.google.android.material.R.id.design_bottom_sheet)!!
 
             val windowManager = context?.getSystemService(WINDOW_SERVICE) as WindowManager
-            val rotation = windowManager.defaultDisplay.rotation
-
-            when (rotation) {
+            when (windowManager.defaultDisplay.rotation) {
                 Surface.ROTATION_0 -> {
                     BottomSheetBehavior.from(bottomSheet).state = STATE_COLLAPSED
                     BottomSheetBehavior.from(bottomSheet).skipCollapsed = false
@@ -101,7 +100,7 @@ class PickleDialogFragment constructor() : DaggerPickleFragment() {
         binding.recyclerView.addItemDecoration(decoration)
         viewModel.items.observe(viewLifecycleOwner, Observer { adapter.submitList(it) })
         viewModel.doneEvent.observe(viewLifecycleOwner, Observer {
-            config.onResultListener?.onSuccess(viewModel.getPickleResult())
+            config.onResultListener?.onSuccess(viewModel.selectionManager.getPickleResult())
             dismiss()
         })
 

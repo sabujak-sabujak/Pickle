@@ -1,9 +1,8 @@
 package life.sabujak.pickle
 
 import androidx.fragment.app.FragmentManager
-import life.sabujak.pickle.data.cursor.CursorType
-import life.sabujak.pickle.ui.common.OnResultListener
 import life.sabujak.pickle.ui.dialog.Config
+import life.sabujak.pickle.ui.dialog.OnResultListener
 import life.sabujak.pickle.ui.dialog.PickleDialogFragment
 import life.sabujak.pickle.ui.insta.InstaFragment
 
