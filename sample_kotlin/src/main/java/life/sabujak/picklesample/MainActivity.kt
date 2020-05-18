@@ -1,13 +1,17 @@
 package life.sabujak.picklesample
 
+import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import life.sabujak.pickle.Pickle
+import life.sabujak.pickle.data.entity.PickleError
 import life.sabujak.pickle.ui.dialog.OnResultListener
 import life.sabujak.pickle.ui.dialog.PickleResult
 import life.sabujak.picklesample.databinding.ActivityMainBinding
+import java.nio.ByteBuffer
+import java.nio.ByteOrder
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -25,7 +29,9 @@ class MainActivity : AppCompatActivity() {
                     val adapter = RvAdapter(ArrayList(result.mediaList))
                     binding.rlView.adapter = adapter
                 }
-                override fun onError(t: Throwable) {
+
+                override fun onError(pickleError: PickleError) {
+                    TODO("Not yet implemented")
                 }
             })
         }
@@ -40,11 +46,12 @@ class MainActivity : AppCompatActivity() {
                     val adapter = RvAdapter(ArrayList(result.mediaList))
                     binding.rlView.adapter = adapter
                 }
-                override fun onError(t: Throwable) {
+
+                override fun onError(pickleError: PickleError) {
+                    TODO("Not yet implemented")
                 }
             })
         }
-
     }
 
     override fun onResume() {
