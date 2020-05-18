@@ -20,7 +20,7 @@ class MainActivity : AppCompatActivity() {
             DataBindingUtil.setContentView(this, R.layout.activity_main)
 
         binding.basic.setOnClickListener {
-            Pickle.start(supportFragmentManager, object :
+            Pickle.start(this,supportFragmentManager, object :
                 OnResultListener {
                 override fun onSuccess(result: PickleResult) {
                     result.mediaList.forEach {

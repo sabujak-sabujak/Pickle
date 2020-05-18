@@ -8,7 +8,6 @@ import android.view.*
 import android.widget.FrameLayout
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -17,11 +16,10 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_EXPANDE
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import dagger.Lazy
 import dagger.android.AndroidInjector
-import kotlinx.android.synthetic.main.layout_top_bar.view.*
 import life.sabujak.pickle.R
 import life.sabujak.pickle.databinding.DialogPickleBinding
-import life.sabujak.pickle.util.recyclerview.GridSpaceDecoration
 import life.sabujak.pickle.util.Logger
+import life.sabujak.pickle.util.recyclerview.GridSpaceDecoration
 import javax.inject.Inject
 
 

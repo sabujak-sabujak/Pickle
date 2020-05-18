@@ -20,7 +20,7 @@ import life.sabujak.pickle.ui.dialog.PickleResult;
 public class MainActivity extends AppCompatActivity {
 
     private ActivityMainBinding binding;
-    private String[] items = new String[]{"Basic","Insta"};
+    private String[] items = new String[]{"Basic", "Insta"};
     private ImageAdapter adapter = new ImageAdapter();
 
     @Override
@@ -29,13 +29,13 @@ public class MainActivity extends AppCompatActivity {
         this.binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        binding.spinner.setAdapter(new ArrayAdapter<>(this,android.R.layout.simple_list_item_1, items));
+        binding.spinner.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, items));
         binding.load.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                switch (items[binding.spinner.getSelectedItemPosition()]){
+                switch (items[binding.spinner.getSelectedItemPosition()]) {
                     case "Basic":
-                        Pickle.start(getSupportFragmentManager(), new OnResultListener() {
+                        Pickle.start(MainActivity.this, getSupportFragmentManager(), new OnResultListener() {
                             @Override
                             public void onSuccess(PickleResult result) {
                                 adapter.submitList(result.getMediaList());
