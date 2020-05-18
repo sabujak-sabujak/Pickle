@@ -8,6 +8,7 @@ import android.view.*
 import android.widget.FrameLayout
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -52,9 +53,10 @@ class PickleDialogFragment constructor() : DaggerPickleFragment() {
         super.onCreate(savedInstanceState)
         if (savedInstanceState == null) {
             val viewModelFactory = PickleViewModelFactory(requireContext().applicationContext as Application, config)
-            viewModel = ViewModelProvider(this, viewModelFactory).get(PickleViewModel::class.java)
+            this.viewModel = ViewModelProvider(this, viewModelFactory).get(PickleViewModel::class.java)
         } else {
-            viewModel = ViewModelProvider(this).get(PickleViewModel::class.java)
+            this.viewModel = ViewModelProvider(this).get(PickleViewModel::class.java)
+            this.config = viewModel.config
         }
     }
 
@@ -104,7 +106,6 @@ class PickleDialogFragment constructor() : DaggerPickleFragment() {
             dismiss()
         })
 
-        binding.root.done
     }
 
 }
